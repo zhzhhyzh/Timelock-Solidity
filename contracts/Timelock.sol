@@ -209,7 +209,7 @@ contract Timelock {
         checkResult();
     }
 
-    function resetVoting() external {
+    function resetVoting() external onlyOwner{
         require(
             block.timestamp >= votingStartTime + VOTING_DURATION,
             "Voting period has not expired yet."
