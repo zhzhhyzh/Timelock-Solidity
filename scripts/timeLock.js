@@ -1,36 +1,75 @@
 
-const createAccount = async (address,name, email) => {
-  const data = await accountManagerContract.methods
-    .createAccount(
-        address,
-      name,
-      email
+const queue = async (address, _value, _func, _data, _timestamp) => {
+  const data = await timelockContract.methods
+    .queue(
+      address, _value, _func, _data, _timestamp
     )
     .send({ from: account });
   console.log(data);
 };
-const getAccountCount = async () => {
-  const data = await accountManagerContract.methods
-    .getAccountCount()
-    .call();
 
-  console.log(data, "HERE");
+const purposeGracePeriod = async (_newGracePeriod) => {
+  const data = await timelockContract.methods
+    .purposeGracePeriod(
+      _newGracePeriod
+    )
+    .send({ from: account });
+  console.log(data);
 };
-const getAccountDetails = async (address) => {
+
+const execute = async (_txid) => {
+  const data = await timelockContract.methods
+    .execute(
+      _txid
+    )
+    .send({ from: account });
+  console.log(data);
+};
+
+const cancel = async (_txid) => {
+  const data = await timelockContract.methods
+    .cancel(
+      _txid
+    )
+    .send({ from: account });
+  console.log(data);
+};
+
+const getTx = async (_txId) => {
   try {
-    const data = await accountManagerContract.methods
-      .getAccountDetails(address)
+    const data = await timelockContract.methods
+      .getTx(_txId)
       .call({ from: account });
-      console.log(data)
+    console.log(data)
     return data
   } catch (err) {
     console.log(generateErrorMessage(err))
     // // Decode the revert reason (skipping the first 4 bytes)
   }
 };
-const purgeAccount = async (_user) => {
-  const data = await accountManagerContract.methods
-    .purgeAccount(_user)
+
+const getTxId = async (address, _value, _func, _data, _timestamp) => {
+  try {
+    const data = await timelockContract.methods
+      .getTxId(address, _value, _func, _data, _timestamp)
+      .call({ from: account });
+    console.log(data)
+    return data
+  } catch (err) {
+    console.log(generateErrorMessage(err))
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+};
+const resetVoting = async () => {
+  const data = await timelockContract.methods
+    .resetVoting()
+    .send({ from: account });
+  console.log(data);
+};
+
+const vote = async () => {
+  const data = await timelockContract.methods
+    .vote()
     .send({ from: account });
   console.log(data);
 };
