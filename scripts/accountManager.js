@@ -28,9 +28,9 @@ const getAccountDetails = async (address) => {
     // // Decode the revert reason (skipping the first 4 bytes)
   }
 };
-const purgeAccount = async (_user) => {
+const purgeAccount = async () => {
   const data = await accountManagerContract.methods
-    .purgeAccount(_user)
+    .purgeAccount("0xe4828E1f3145B29aBd10727309fd68Babc89EC6F")
     .send({ from: account });
   console.log(data);
 };
