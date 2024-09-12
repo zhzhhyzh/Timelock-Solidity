@@ -11,7 +11,7 @@ const accessToMetamask = async () => {
       method: "eth_requestAccounts",
     });
     account = accounts[1];
-    console.log(account)
+    document.getElementById("address").innerText= account
     // document.getElementById("accountArea").innerHTML = account;
   }
 };

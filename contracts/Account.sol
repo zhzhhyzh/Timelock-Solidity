@@ -12,7 +12,7 @@ contract AccountManager {
     uint256 total = 0;
 
     // State variable to store the contract owner's address
-    address private owner;
+    address private admin;
 
     // Mapping to store accounts with the address as the key
     mapping(address => Account)  public accounts;
@@ -24,18 +24,24 @@ contract AccountManager {
     event AccountPurged(address indexed user);
 
     // Modifier to restrict access to only the owner
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the contract owner");
+    modifier onlyAdmin() {
+        require(msg.sender == adminContract.getCurrentAdmin(), "Not the contract admin");
         _;
     }
 
     // Constructor to set the contract owner
     constructor() {
-        owner = msg.sender;
+        // owner = msg.sender;
     }
 
+        VoteAdmin  public adminContract;
+
+
+    function setAdminContract(address _address) public {
+        adminContract = VoteAdmin(_address);
+    }
     // Function to create or update an account
-    function createAccount(address _user, string memory _name, string memory _email) public onlyOwner {
+    function createAccount(address _user, string memory _name, string memory _email) public onlyAdmin {
         // Create or update the account details
         accounts[_user] = Account({
             name: _name,
@@ -47,7 +53,7 @@ contract AccountManager {
     }
 
     // Function to purge an account
-    function purgeAccount(address _user) public onlyOwner {
+    function purgeAccount(address _user) public onlyAdmin {
         require(accounts[_user].exists, "Account does not exist");
         total--;
         // Delete the account details
@@ -57,7 +63,7 @@ contract AccountManager {
     }
 
     // Function to get account details
-    function getAccountDetails(address _user) public view onlyOwner returns (string memory name, string memory email) {
+    function getAccountDetails(address _user) public view onlyAdmin returns (string memory name, string memory email) {
         require(accounts[_user].exists, "Account does not exist");
 
         Account memory account = accounts[_user];

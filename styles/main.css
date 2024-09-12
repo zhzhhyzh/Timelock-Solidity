@@ -28,6 +28,12 @@ body {
 input[type="text"],
 input[type="password"] {
   width: 100%;
+}
+input[type="number"] {
+  width: 75%;
+}
+
+input {
   padding: 15px;
   margin: 5px 0 22px 0;
   display: inline-block;
@@ -35,6 +41,7 @@ input[type="password"] {
   background: #f7f7f7;
   font-family: Montserrat, Arial, Helvetica, sans-serif;
 }
+
 select {
   width: 18%;
   padding: 15px;
@@ -56,6 +63,7 @@ input[type="phone"] {
 
 input[type="text"]:focus,
 input[type="password"]:focus,
+input[type="number"]:focus,
 input[type="phone"]:focus,
 select:focus {
   background-color: #ddd;
@@ -90,8 +98,8 @@ button:hover {
 
 .avatars {
   display: flex;
-  position:fixed;
-  right:2px;
+  position: fixed;
+  right: 2px;
   list-style-type: none;
   margin: auto;
   padding: 0px;
@@ -139,7 +147,16 @@ button:hover {
   margin-right: 10px;
 }
 
-#address{
+#address {
+  margin-right: 30px;
+}
 
-    margin-right: 30px;
+.proposed-grace-period {
+  text-align: center;
+  margin: 20px 0px;
+}
+
+.btn-cancel {
+  background-color: red;
+  opacity: 0.8;
 }
