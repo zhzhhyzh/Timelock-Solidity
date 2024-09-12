@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "./Account.sol";
 
 contract Timelock {
-    error NotOwnerError();
+    error NotAdminError();
     error AlreadyQueuedError(bytes32 txId);
     error TimestampNotInRangeError(uint256 blockTimestamp, uint256 timestamp);
     error NotQueuedError(bytes32 txId);
@@ -58,7 +58,7 @@ contract Timelock {
     uint256 private constant MIN_DELAY = 10; // seconds
     uint256 private constant MAX_DELAY = 1000; // seconds.
     uint256 private gracePeriod = 30; // seconds
-    address private owner;
+    // address private admin;
     uint256 private votingStartTime;
     uint256 private constant VOTING_DURATION = 1 hours; // Duration for voting
 
@@ -66,17 +66,19 @@ contract Timelock {
     mapping(bytes32 => Tx) private txs;
     // Declare a reference to the imported AccountsContract
     AccountManager  public accountsContract;
+    VoteAdmin  public voteAdminContract;
 
     // Constructor sets the address of the deployed AccountsContract
 
-    constructor(address _accountsContractAddress) {
-        owner = msg.sender;
+    constructor(address _accountsContractAddress, address _voteAdminAddress) {
+        // admin = msg.sender;
         accountsContract = AccountManager(_accountsContractAddress);
+        voteAdminContract = VoteAdmin(_voteAdminAddress);
     }
 
-    modifier onlyOwner() {
-        if (msg.sender != owner) {
-            revert NotOwnerError();
+    modifier onlyAdmin() {
+        if (msg.sender != voteAdminContract.getCurrentAdmin()) {
+            revert NotAdminError();
         }
         _;
     }
@@ -99,7 +101,7 @@ contract Timelock {
         string calldata _func,
         bytes calldata _data,
         uint256 _timestamp
-    ) external onlyOwner returns (bytes32) {
+    ) external onlyAdmin returns (bytes32) {
         bytes32 txId = getTxId(_target, _value, _func, _data, _timestamp);
         if (txs[txId].queued) {
             revert AlreadyQueuedError(txId);
@@ -129,7 +131,7 @@ contract Timelock {
     function execute(bytes32 _txId)
         external
         payable
-        onlyOwner
+        onlyAdmin
         returns (bytes memory)
     {
         if (!txs[_txId].queued) {
@@ -174,7 +176,7 @@ contract Timelock {
         return res;
     }
 
-    function cancel(bytes32 _txId) external onlyOwner {
+    function cancel(bytes32 _txId) external onlyAdmin {
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
         }
@@ -209,7 +211,7 @@ contract Timelock {
         checkResult();
     }
 
-    function resetVoting() external onlyOwner{
+    function resetVoting() external onlyAdmin{
         require(
             block.timestamp >= votingStartTime + VOTING_DURATION,
             "Voting period has not expired yet."
