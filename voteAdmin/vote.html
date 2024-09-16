@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Propose Admin Voting</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+
+  <link rel="stylesheet" href="../styles/main.css" />
+  <link rel="stylesheet" href="../styles/navbar.css" />
+
+  <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
+</head>
+
+<body>
+  <div class="body-pd">
+    <div class="l-navbar" id="navbar">
+      <nav class="nav">
+        <div>
+          <div class="nav__brand">
+            <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
+            <a href="#" class="nav__logo">Bedimcode</a>
+          </div>
+          <div class="nav__list">
+            <a href="#" class="nav__link active">
+              <ion-icon name="home-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Dashboard</span>
+            </a>
+            <a href="#" class="nav__link">
+              <ion-icon name="chatbubbles-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Messenger</span>
+            </a>
+
+            <div class="nav__link collapse">
+              <ion-icon name="folder-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Projects</span>
+
+              <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+              <ul class="collapse__menu">
+                <a href="#" class="collapse__sublink">Data</a>
+                <a href="#" class="collapse__sublink">Group</a>
+                <a href="#" class="collapse__sublink">Members</a>
+              </ul>
+            </div>
+
+            <a href="#" class="nav__link">
+              <ion-icon name="pie-chart-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Analytics</span>
+            </a>
+            <div class="nav__link collapse">
+              <ion-icon name="people-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Team</span>
+
+              <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+              <ul class="collapse__menu">
+                <a href="#" class="collapse__sublink">Data</a>
+                <a href="#" class="collapse__sublink">Group</a>
+                <a href="#" class="collapse__sublink">Members</a>
+              </ul>
+            </div>
+            <a href="#" class="nav__link">
+              <ion-icon name="settings-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Settings</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="#" class="nav__link">
+          <ion-icon name="log-out-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Log Out</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <form onsubmit="return false">
+    <div class="container">
+      <h1>Propose Admin</h1>
+
+
+      <div class="clearfix">
+        <button onclick="_startVotingfunction()" class="btn">Start Voting</button>
+        <button onclick="_voteForAdminfunction()" class="btn">Vote For Admin</button>
+        <button onclick="_finalizeAdminfunction()" class="btn">Finalize</button>
+
+      </div>
+    </div>
+  </form>
+  <div class="avatars">
+    <p id="address"></p>
+    <a href="#" onclick="switchAccount(0)" class="avatars__item"><img class="avatar"
+        src="https://randomuser.me/api/portraits/women/65.jpg" alt=""></a>
+    <a href="#" onclick="switchAccount(1)" class="avatars__item"><img class="avatar"
+        src="https://randomuser.me/api/portraits/men/25.jpg" alt=""></a>
+    <a href="#" onclick="switchAccount(2)" class="avatars__item"><img class="avatar"
+        src="https://randomuser.me/api/portraits/women/25.jpg" alt=""></a>
+
+  </div>
+</body>
+<script>
+  let _finalizeAdminfunction = async () => {
+
+    await finalizeAdmin(address);
+  };
+  let _startVotingfunction = async () => {
+
+    await startVoting(address);
+  };
+  let _voteForAdminfunction = async () => {
+
+    await voteForAdmin(address);
+  };
+</script>
+<script src="../scripts/voteAdmin.js"></script>
+
+<script src="../scripts/config.js"></script>
+<script src="../scripts/navbar.js"></script>
+
+</html>
