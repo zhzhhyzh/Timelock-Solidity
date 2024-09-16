@@ -118,7 +118,7 @@ contract VoteAdmin {
         // Reset the voting state
         resetVoting();
     }
-    function getCurrentAdmin() public returns (address) {
+    function getCurrentAdmin() public view returns (address) {
         return admin;
     }
 
@@ -127,14 +127,14 @@ contract VoteAdmin {
         proposedAdmin = address(0);
         votingActive = false;
 
-       voted = [];
+       voted = new address[](0); 
     }
 
     // Get total votes cast
     function getTotalVotes() internal view returns (uint totalVotes) {
         totalVotes = 0;
         for (uint i = 0; i < voted.length; i++) {
-            totalVotes += voted[[i]];
+            totalVotes += voted.length;
         }
 
         return totalVotes;

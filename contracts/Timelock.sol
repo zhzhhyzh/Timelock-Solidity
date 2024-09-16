@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./Account.sol";
+import "./VoteAdmin.sol";
 
 contract Timelock {
     error NotAdminError();

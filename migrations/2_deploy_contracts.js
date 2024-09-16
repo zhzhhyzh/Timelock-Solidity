@@ -1,19 +1,26 @@
 var TimelockContract = artifacts.require("Timelock");
 var AccountManagerContract = artifacts.require("AccountManager");
+var VoteAdminContract = artifacts.require("VoteAdmin")
 
 module.exports = async function (deployer) {
   // deployment steps
 
   let accManagerContractAddress = "";
+  let TimelockContractAddress = "";
+  let voteAdminContractAddress = "";
   await deployer.deploy(AccountManagerContract).then(({ address }) => {
     console.log(address)
     accManagerContractAddress = address;
-    // console.log(address);
-    // .then(({address:address2})=>console.log(address2))
-    // console.log("RANN")
-    //   .then(({address:address2}) =>
-    //     console.log(address2)
-    // )
+
   });
-  if (accManagerContractAddress) await deployer.deploy(TimelockContract, accManagerContractAddress);
+  if (accManagerContractAddress) await deployer.deploy(VoteAdminContract, accManagerContractAddress).then(({ address }) => {
+    console.log(address)
+    voteAdminContractAddress = address;
+
+  });
+  if (voteAdminContractAddress) await deployer.deploy(AccountManagerContract, accManagerContractAddress, voteAdminContractAddress).then(({ address }) => {
+    console.log(address)
+    TimelockContractAddress = address;
+
+  });
 };
