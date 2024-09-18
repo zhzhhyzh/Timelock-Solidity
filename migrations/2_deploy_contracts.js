@@ -18,7 +18,7 @@ module.exports = async function (deployer) {
     voteAdminContractAddress = address;
 
   });
-  if (voteAdminContractAddress) await deployer.deploy(AccountManagerContract, accManagerContractAddress, voteAdminContractAddress).then(({ address }) => {
+  if (voteAdminContractAddress) await deployer.deploy(TimelockContract, accManagerContractAddress, voteAdminContractAddress).then(({ address }) => {
     console.log(address)
     TimelockContractAddress = address;
 

@@ -1,6 +1,6 @@
 
 const proposeAdmin = async (address) => {
-  const data = await finalizeAdminAdminContract.methods
+  const data = await voteAdminContract.methods
     .proposeAdmin(
       address
     )
@@ -8,14 +8,14 @@ const proposeAdmin = async (address) => {
   console.log(data);
 };
 const finalizeAdmin = async () => {
-  const data = await finalizeAdminAdminContract.methods
+  const data = await voteAdminContract.methods
     .finalizeAdmin(
   )
     .send({ from: account });
   console.log(data);
 };
 const startVoting = async () => {
-  const data = await finalizeAdminAdminContract.methods
+  const data = await voteAdminContract.methods
     .startVoting(
   )
     .send({ from: account });
@@ -23,7 +23,7 @@ const startVoting = async () => {
 };
 
 const voteForAdmin = async () => {
-  const data = await finalizeAdminAdminContract.methods
+  const data = await voteAdminContract.methods
     .voteForAdmin(
   )
     .send({ from: account });

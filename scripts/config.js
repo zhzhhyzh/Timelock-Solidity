@@ -28,12 +28,12 @@ const accessToContract = async () => {
   const timelockABI = data.abi;
   const accountManagerABI = data2.abi;
   const voteAdminABI = data3.abi;
-  const timelockAddress = "0xa6116D955A60E3dF784E2326871c703dc5311DF9";
+  const timelockAddress = "0x898cd6451c23ADF43dDdFfe92E7d9faEc1792781";
   const accountManagerAddress =
-    "0x7ad0C5e4dFA737c481c99C2295b37b9254A9c9c2";
+    "0xA308a1240D10bB9aC37EA560677C0eb6D8B40d00";
 
   const voteAdminAddress =
-    "0x7ad0C5e4dFA737c481c99C2295b37b9254A9c9c2";
+    "0x5e3f514a35B57313E9650936fA096CB64303F2F5";
   window.web3 = await new Web3(window.ethereum); //how to access to smart contract
   timelockContract = await new window.web3.eth.Contract(
     timelockABI,
