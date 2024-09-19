@@ -1,130 +1,107 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "./Account.sol";
-import "./VoteAdmin.sol";
+import "./AccountManager.sol";
 
 contract Timelock {
-    error NotAdminError();
-    error AlreadyQueuedError(bytes32 txId);
-    error TimestampNotInRangeError(uint256 blockTimestamp, uint256 timestamp);
-    error NotQueuedError(bytes32 txId);
-    error TimestampNotPassedError(uint256 blockTimestmap, uint256 timestamp);
-    error TimestampExpiredError(uint256 blockTimestamp, uint256 expiresAt);
-    error InvalidGracePeriodError();
-    error VotingNotAllowedError();
-    error AlreadyVotedError();
-    error NoProposalError();
-
-    event VotingReset();
-
-    event GracePeriodUpdated(uint256 newGracePeriod);
-    struct Tx {
-        bytes32 txId;
-        address target;
-        uint256 value;
-        string func;
-        bytes data;
-        uint256 timestamp;
-        bool queued;
+    constructor(
+        address _accountsContractAddress,
+        uint256 _minGracePeriod,
+        uint256 _maxGracePeriod
+    ) {
+        // admin = msg.sender;
+        accountsContract = AccountManager(_accountsContractAddress);
+        minGracePeriod = _minGracePeriod;
+        maxGracePeriod = _maxGracePeriod;
     }
+
+    //Transaction
+    error AlreadyQueuedError(bytes32 txId);
+    error NotQueuedError(bytes32 txId);
+    error TimestampNotPassedError(uint256 blockTimestamp, uint256 timestamp);
+    error TimestampExpiredError(uint256 blockTimestamp, uint256 expiresAt);
     error TxFailedError();
+    error NotAdminError();
+
     event Queue(
         bytes32 indexed txId,
         address indexed target,
         uint256 value,
-        string func,
-        bytes data,
         uint256 timestamp
     );
     event Execute(
         bytes32 indexed txId,
         address indexed target,
         uint256 value,
-        string func,
-        bytes data,
         uint256 timestamp
     );
-    
     event Cancel(bytes32 indexed txId);
-    modifier onlyVoter() {
-        if (!accountsContract.accountExists(msg.sender)) {
-            revert VotingNotAllowedError();
-        }
-        _;
-    }
-    mapping(address => bool) private hasVoted;
-    uint256 private totalVotes;
-    uint256 private votesForNewPeriod;
-    uint256 private proposedGracePeriod;
-    uint256 private constant MIN_DELAY = 10; // seconds
-    uint256 private constant MAX_DELAY = 1000; // seconds.
-    uint256 private gracePeriod = 30; // seconds
-    // address private admin;
-    uint256 private votingStartTime;
-    uint256 private constant VOTING_DURATION = 1 hours; // Duration for voting
+    event Deposited(address indexed user, uint256 amount);
 
-    // tx id => tx
+    // Struct to store transaction details
+    struct Tx {
+        bytes32 txId;
+        address target;
+        uint256 value;
+        uint256 timestamp;
+        bool queued;
+    }
+
+    // Mapping of transaction IDs to transaction data
     mapping(bytes32 => Tx) private txs;
-    // Declare a reference to the imported AccountsContract
-    AccountManager  public accountsContract;
-    VoteAdmin  public voteAdminContract;
 
-    // Constructor sets the address of the deployed AccountsContract
+    address public admin;
 
-    constructor(address _accountsContractAddress, address _voteAdminAddress) {
-        // admin = msg.sender;
-        accountsContract = AccountManager(_accountsContractAddress);
-        voteAdminContract = VoteAdmin(_voteAdminAddress);
+    uint256 private gracePeriod;
+
+    address public whoDeposited;
+    uint256 public depositAmt;
+    uint256 public accountBalance;
+
+    receive() external payable {
+        accountBalance += msg.value;
+        whoDeposited = msg.sender;
+        depositAmt = msg.value;
+        emit Deposited(msg.sender, msg.value);
     }
 
-    modifier onlyAdmin() {
-        if (msg.sender != voteAdminContract.getCurrentAdmin()) {
-            revert NotAdminError();
-        }
-        _;
+    fallback() external payable {
+        accountBalance += msg.value;
+        whoDeposited = msg.sender;
+        depositAmt = msg.value;
+        emit Deposited(msg.sender, msg.value);
     }
 
-    receive() external payable {}
-
-    function getTxId(
-        address _target,
-        uint256 _value,
-        string calldata _func,
-        bytes calldata _data,
-        uint256 _timestamp
-    ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_target, _value, _func, _data, _timestamp));
+    function getGracePeriod() public view returns (uint256) {
+        return gracePeriod;
     }
 
-    function queue(
-        address _target,
-        uint256 _value,
-        string calldata _func,
-        bytes calldata _data,
-        uint256 _timestamp
-    ) external onlyAdmin returns (bytes32) {
-        bytes32 txId = getTxId(_target, _value, _func, _data, _timestamp);
+    function getTxId(address _target, uint256 _value)
+        public
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encode(_target, _value));
+    }
+
+    function queue(address _target, uint256 _value)
+        external
+        
+        returns (bytes32)
+    {
+        // Generate the transaction ID based on the target and value
+        bytes32 txId = getTxId(_target, _value);
+
+        // Ensure the transaction is not already queued
         if (txs[txId].queued) {
             revert AlreadyQueuedError(txId);
         }
-        Tx memory currentTx = Tx(
-            txId,
-            _target,
-            _value,
-            _func,
-            _data,
-            _timestamp,
-            true
-        );
 
-        if (
-            _timestamp < block.timestamp + MIN_DELAY ||
-            _timestamp > block.timestamp + MAX_DELAY
-        ) {
-            revert TimestampNotInRangeError(block.timestamp, _timestamp);
-        }
+        // Store the new transaction
+        Tx memory currentTx = Tx(txId, _target, _value, block.timestamp, true);
         txs[txId] = currentTx;
-        emit Queue(txId, _target, _value, _func, _data, _timestamp);
+
+        // Emit the Queue event
+        emit Queue(txId, _target, _value, block.timestamp);
 
         return txId;
     }
@@ -132,56 +109,64 @@ contract Timelock {
     function execute(bytes32 _txId)
         external
         payable
-        onlyAdmin
+        
         returns (bytes memory)
     {
+        // Ensure the transaction is actually queued
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
         }
+
         Tx memory currentTx = txs[_txId];
+
+        // Ensure the timestamp has passed for execution
         if (block.timestamp < currentTx.timestamp) {
             revert TimestampNotPassedError(
                 block.timestamp,
                 currentTx.timestamp
             );
         }
+
+        // Ensure the transaction is executed within the grace period
         if (block.timestamp > currentTx.timestamp + gracePeriod) {
-            revert TimestampExpiredError(block.timestamp, gracePeriod);
+            revert TimestampExpiredError(
+                block.timestamp,
+                currentTx.timestamp + gracePeriod
+            );
         }
 
+        // Mark the transaction as executed
         txs[_txId].queued = false;
-        // prepare data.
-        bytes memory data;
-        if (bytes(currentTx.func).length > 0) {
-            // data func selector + _data
-            data = abi.encodePacked(bytes4(keccak256(bytes(currentTx.func))));
-        } else {
-            // call fallback with data.
-            data = currentTx.data;
-        } // call target
+
+        // Execute the transaction using the .call function
         (bool ok, bytes memory res) = currentTx.target.call{
             value: currentTx.value
-        }(data);
+        }("");
         if (!ok) {
             revert TxFailedError();
         }
 
+        // Emit the Execute event
         emit Execute(
             _txId,
             currentTx.target,
             currentTx.value,
-            currentTx.func,
-            currentTx.data,
             currentTx.timestamp
         );
+
         return res;
     }
 
-    function cancel(bytes32 _txId) external onlyAdmin {
+    function cancel(bytes32 _txId) external  {
+        // Ensure the transaction is queued
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
         }
+
+        // Mark the transaction as canceled
         txs[_txId].queued = false;
+
+        // Emit the Cancel event
         emit Cancel(_txId);
     }
 
@@ -193,60 +178,130 @@ contract Timelock {
         return txs[_txId];
     }
 
-    // VOTING SYSTEM
-    function proposeGracePeriod(uint256 _newGracePeriod) external onlyVoter {
-        if(proposedGracePeriod<=0) revert NoProposalError();
-        if (_newGracePeriod <= 0) {
-            revert InvalidGracePeriodError();
-        }
-        proposedGracePeriod = _newGracePeriod;
-        hasVoted[msg.sender] = true;
-        votesForNewPeriod++;
-        totalVotes = getTotalAccounts();
-        checkResult();
+    // Function to withdraw Ether from the contract (only admin)
+    function withdraw(uint256 _amount) external  {
+        require(_amount <= accountBalance, "Insufficient contract balance");
+        accountBalance -= _amount;
+        payable(msg.sender).transfer(_amount);
     }
 
-    function vote() external onlyVoter {
-        if (hasVoted[msg.sender] == true) revert AlreadyVotedError();
-        votesForNewPeriod++;
-        checkResult();
-    }
+    //Grace Period Changing
+    AccountManager public accountsContract;
+    event NewGracePeriodProposed(uint256 newGracePeriod);
+    event GracePeriodChanged(uint256 gracePeriod);
+    event VotingFinalized(uint256 newGracePeriod);
+    address public owner;
+    uint256 public minGracePeriod;
+    uint256 public maxGracePeriod;
 
-    function resetVoting() external onlyAdmin{
+    uint256 private votingStartTime;
+    uint256 private votingEndTime;
+    uint256 private proposalDeadline;
+    bool private votingActive;
+    uint256 private voteThreshold;
+    address[] public voted;
+    uint256 private proposedGracePeriod;
+    modifier onlyAdmin() {
         require(
-            block.timestamp >= votingStartTime + VOTING_DURATION,
-            "Voting period has not expired yet."
+            msg.sender == accountsContract.getAdmin(),
+            "Not Contract Admin"
         );
-        _resetVoting();
+        _;
     }
 
-    // Check if we have enough votes (simple majority)
-    function checkResult() internal {
-        if (votesForNewPeriod * 2 > totalVotes) {
-            gracePeriod = proposedGracePeriod;
-            emit GracePeriodUpdated(gracePeriod);
-            _resetVoting();
+    modifier duringVotingPhase() {
+        require(
+            block.timestamp >= votingStartTime &&
+                block.timestamp <= votingEndTime,
+            "Voting phase is not active."
+        );
+        _;
+    }
+
+    modifier afterVotingPhase() {
+        require(
+            block.timestamp > votingEndTime,
+            "Voting period has not ended."
+        );
+        _;
+    }
+
+    function startVoting(uint256 _proposedGracePeriod) public onlyAdmin {
+        require(
+            (_proposedGracePeriod >= minGracePeriod &&
+                _proposedGracePeriod <= maxGracePeriod),
+            "Proposed grace Period Out of range"
+        );
+        require(!votingActive, "Voting is already active.");
+        votingStartTime = block.timestamp;
+        votingEndTime = block.timestamp + 120; // Total of 2 minutes
+
+        votingActive = true;
+
+        updateVoteThreshold();
+        proposedGracePeriod = _proposedGracePeriod;
+        emit NewGracePeriodProposed(proposedGracePeriod);
+    }
+
+    function updateVoteThreshold() internal {
+        uint256 totalRegisteredUsers = accountsContract.getAccountCount();
+        voteThreshold = (totalRegisteredUsers * 51 + 99) / 100; // Equivalent to rounding up (51% rule)
+    }
+
+    function voteForAdmin() public duringVotingPhase {
+        require(proposedGracePeriod != 0, "No admin proposed.");
+        require(
+            accountsContract.accountExists(msg.sender),
+            "Only registered users can vote."
+        );
+        require(voterHasVoted(msg.sender), "Already voted.");
+
+        voted.push(msg.sender);
+
+        // Check if vote threshold has been met
+        if (getTotalVotes() >= voteThreshold) {
+            finalizeVote();
         }
     }
 
-    function _resetVoting() internal {
-        for (uint256 i = 0; i < totalVotes; i++) {
-            hasVoted[tx.origin] = false;
+    function voterHasVoted(address _address) public view returns (bool) {
+        for (uint256 i = 0; i < voted.length; i++) {
+            if (voted[i] == _address) {
+                return true;
+            }
         }
-        totalVotes = 0;
-        votesForNewPeriod = 0;
-        votingStartTime = 0;
-        emit VotingReset();
+
+        return false;
     }
 
-   
-    // Example function to get the total number of accounts
-    function getTotalAccounts() internal view returns (uint256) {
-        return accountsContract.getAccountCount();
+    // FINALIZE the voting process after 10 minutes
+    function finalizeVote() public afterVotingPhase {
+        require(proposedGracePeriod != 0, "No proposed grace period.");
+
+        gracePeriod = proposedGracePeriod;
+        emit GracePeriodChanged(proposedGracePeriod);
+        emit VotingFinalized(proposedGracePeriod);
+
+        resetVoting();
     }
 
-
-    function getGracePeriod() internal view returns (uint256) {
+    function getCurrentGracePeriod() public view returns (uint256) {
         return gracePeriod;
+    }
+
+    function resetVoting() internal {
+        proposedGracePeriod = 0;
+        votingActive = false;
+
+        voted = new address[](0);
+    }
+
+    function getTotalVotes() internal view returns (uint256 totalVotes) {
+        totalVotes = 0;
+        for (uint256 i = 0; i < voted.length; i++) {
+            totalVotes += voted.length;
+        }
+
+        return totalVotes;
     }
 }

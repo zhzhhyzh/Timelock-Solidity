@@ -1,82 +1,265 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "./VoteAdmin.sol";
 
 contract AccountManager {
-    // Define a struct to hold account details
+    //Account Manager
+
     struct Account {
+        address userAddress;
         string name;
         string email;
-        bool exists;
+        bool exist;
     }
 
-    uint256 total = 0;
-
-    // State variable to store the contract owner's address
+    uint256 public totalAccounts = 0;
     address private admin;
 
-    // Mapping to store accounts with the address as the key
-    mapping(address => Account)  public accounts;
+    mapping(address => Account) public accounts;
 
-    // Event to be emitted when an account is created
+    address[] public accountAddresses;
+
+    // Events
     event AccountCreated(address indexed user, string name, string email);
-
-    // Event to be emitted when an account is purged
     event AccountPurged(address indexed user);
 
-    // Modifier to restrict access to only the owner
+    // Modifiers
     modifier onlyAdmin() {
-        require(msg.sender == adminContract.getCurrentAdmin(), "Not the contract admin");
+        require(msg.sender == admin, "Not Contract Admin");
         _;
     }
 
-    // Constructor to set the contract owner
     constructor() {
-        // owner = msg.sender;
+        admin = msg.sender;
     }
 
-        VoteAdmin  public adminContract;
-
-
-    function setAdminContract(address _address) public {
-        adminContract = VoteAdmin(_address);
+    function getAdmin() public view returns (address) {
+        return admin;
     }
-    // Function to create or update an account
-    function createAccount(address _user, string memory _name, string memory _email) public onlyAdmin {
-        // Create or update the account details
+
+    function getAllAccounts() public view returns (Account[] memory) {
+        Account[] memory allAccounts = new Account[](totalAccounts);
+        uint256 count = 0;
+
+        for (uint256 i = 0; i < accountAddresses.length; i++) {
+            if (accounts[accountAddresses[i]].exist) {
+                allAccounts[count] = accounts[accountAddresses[i]];
+                count++;
+            }
+        }
+
+        return allAccounts;
+    }
+
+    function getAccountCount() public view returns (uint256) {
+        return totalAccounts;
+    }
+
+    function accountExists(address _account) public view returns (bool) {
+        return accounts[_account].exist;
+    }
+
+    function createAccount(
+        address _user,
+        string memory _name,
+        string memory _email
+    ) public onlyAdmin notDuringVotingPhase {
+        require(!accounts[_user].exist, "Account already exists");
+
         accounts[_user] = Account({
+            userAddress: _user,
             name: _name,
             email: _email,
-            exists: true
+            exist: true
         });
-        total++;
+        accountAddresses.push(_user); // Add the user's address to the array
+        totalAccounts++;
+
         emit AccountCreated(_user, _name, _email);
     }
 
-    // Function to purge an account
     function purgeAccount(address _user) public onlyAdmin {
-        require(accounts[_user].exists, "Account does not exist");
-        total--;
-        // Delete the account details
+        require(accounts[_user].exist, "Account doesn't exist");
+
+        totalAccounts--;
         delete accounts[_user];
+
+        for (uint256 i = 0; i < accountAddresses.length; i++) {
+            if (accountAddresses[i] == _user) {
+                accountAddresses[i] = accountAddresses[
+                    accountAddresses.length - 1
+                ];
+                accountAddresses.pop(); // Remove last element
+                break;
+            }
+        }
 
         emit AccountPurged(_user);
     }
 
-    // Function to get account details
-    function getAccountDetails(address _user) public view onlyAdmin returns (string memory name, string memory email) {
-        require(accounts[_user].exists, "Account does not exist");
-
+    function getAccountDetails(address _user)
+        public
+        view
+        onlyAdmin
+        returns (string memory name, string memory email)
+    {
+        require(accounts[_user].exist, "Account doesn't exist");
         Account memory account = accounts[_user];
         return (account.name, account.email);
     }
 
-    // Retrieve the total number of accounts
-    function getAccountCount() external view returns (uint256) {
-        return total;
+    //Vote Admin
+    struct proposedAdmin {
+        string name;
+        bool exist;
+        uint256 votes;
     }
-   // Function to check if an account exists
-    function accountExists(address _account) public view returns (bool) {
-        return bytes(accounts[_account].name).length > 0;
+    mapping(address => proposedAdmin) public proposedAdmins;
+    uint256 private voteThreshold;
+    address[] public proposedAdminAddresses;
+    uint256 private votingStartTime;
+    uint256 private votingEndTime;
+    uint256 private proposalDeadline;
+    bool private votingActive;
+    uint256 proposedAdminsCounts;
+    address[] public voted;
+    event AdminChanged(address indexed newAdmin);
+    modifier duringProposalPhase() {
+        require(
+            block.timestamp <= proposalDeadline,
+            "Proposal phase has ended."
+        );
+        _;
+    }
+
+    modifier duringVotingPhase() {
+        require(
+            block.timestamp >= proposalDeadline &&
+                block.timestamp <= votingEndTime,
+            "Voting phase is not active."
+        );
+        _;
+    }
+
+    modifier notDuringVotingPhase() {
+        require(
+            block.timestamp < proposalDeadline ||
+                block.timestamp > votingEndTime,
+            "Voting phase is active."
+        );
+        _;
+    }
+
+    modifier afterVotingPhase() {
+        require(
+            block.timestamp > votingEndTime,
+            "Voting period has not ended."
+        );
+        _;
+    }
+
+    modifier adminProposedRestrict() {
+        require(proposedAdminsCounts < 3, "Proposed Admin Full");
+        _;
+    }
+
+    modifier checkAdminProposed() {
+        require(proposedAdminsCounts != 0, "No admin proposed");
+        _;
+    }
+
+    function startVoting() public onlyAdmin {
+        require(!votingActive, "Voting is already active.");
+        votingStartTime = block.timestamp;
+        proposalDeadline = block.timestamp + 60; // First 1 minutes for proposing
+        votingEndTime = block.timestamp + 120; // Total of 2 minutes
+
+        votingActive = true;
+        updateVoteThreshold();
+    }
+
+    function updateVoteThreshold() internal {
+        uint256 totalRegisteredUsers = getAccountCount();
+        voteThreshold = (totalRegisteredUsers * 51 + 99) / 100; // Equivalent to rounding up (51% rule)
+    }
+
+    function proposeAdmin(address _admin)
+        public
+        duringProposalPhase
+        adminProposedRestrict
+    {
+        require(
+            accounts[_admin].exist,
+            "Address is not in the Account contract"
+        );
+        require(!proposedAdmins[_admin].exist, "Admin is already proposed.");
+        proposedAdmins[_admin] = proposedAdmin(accounts[_admin].name, true, 0);
+        proposedAdminAddresses.push(_admin);
+        proposedAdminsCounts++;
+    }
+
+    function voteForAdmin(address _admin)
+        public
+        duringVotingPhase
+        checkAdminProposed
+    {
+        require(accountExists(msg.sender), "Only registered users can vote.");
+        require(!voterHasVoted(msg.sender), "Already voted.");
+        voted.push(msg.sender);
+        proposedAdmins[_admin].votes++; //Increment the voted proposed admin votes
+
+        if (proposedAdmins[_admin].votes >= voteThreshold) {
+            finalizeAdminByThresHold(_admin);
+        }
+    }
+
+    function finalizeAdminByThresHold(address _admin) internal {
+        admin = _admin;
+
+        emit AdminChanged(_admin);
+        resetVoting();
+    }
+
+    function finalizeAdmin() public afterVotingPhase checkAdminProposed {
+        address mostVotedAdmin;
+        uint256 highestVotes = 0;
+
+        for (uint256 i = 0; i < proposedAdminAddresses.length; i++) {
+            address proposedAddress = proposedAdminAddresses[i];
+            uint256 votes = proposedAdmins[proposedAddress].votes;
+
+            // Check if the current admin has more votes than the current highest
+            if (votes > highestVotes) {
+                highestVotes = votes;
+                mostVotedAdmin = proposedAddress;
+            }
+        }
+
+        require(mostVotedAdmin != address(0), "No valid admin found.");
+
+        // Set the new admin
+        admin = mostVotedAdmin;
+
+        emit AdminChanged(mostVotedAdmin); // Emit an event for admin change
+
+        resetVoting();
+    }
+
+    function resetVoting() internal {
+        for (uint256 i = 0; i < voted.length; i++) {
+            delete proposedAdmins[voted[i]]; // Reset the proposed admin votes
+        }
+        votingActive = false;
+        proposedAdminsCounts = 0;
+        delete proposedAdminAddresses;
+        delete voted;
+    }
+
+    function voterHasVoted(address _address) public view returns (bool) {
+        for (uint256 i = 0; i < voted.length; i++) {
+            if (voted[i] == _address) {
+                return true;
+            }
+        }
+        return false;
     }
 }
