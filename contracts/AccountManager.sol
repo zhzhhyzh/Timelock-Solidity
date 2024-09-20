@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract AccountManager {
-    //Account Manager
+    //Account Manager----------------------------------------
 
     struct Account {
         address userAddress;
@@ -19,7 +19,6 @@ contract AccountManager {
 
     address[] public accountAddresses;
 
-    // Events
     event AccountCreated(
         address indexed user,
         string name,
@@ -108,7 +107,7 @@ contract AccountManager {
     function getAccountDetails(address _user)
         public
         view
-        onlyAdmin
+        
         returns (
             string memory name,
             string memory email,
@@ -147,7 +146,7 @@ contract AccountManager {
         emit WithdrawalMade(msg.sender, _amount);
     }
 
-    function depositUpdate(address _user, uint256 _newAmount) public onlyAdmin {
+    function depositUpdate(address _user, uint256 _newAmount) public  returns (bool success) {
         require(accounts[_user].exist, "Account doesn't exist");
 
         // Update the user's value to the new amount
@@ -155,13 +154,24 @@ contract AccountManager {
 
         // Emit the DepositUpdated event
         emit DepositUpdated(_user, _newAmount);
+        return true;
     }
 
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
-    //Vote Admin
+    function getAccountDeposit(address _target)
+        public
+        view
+        returns (uint256 value)
+    {
+        require(accounts[_target].exist, "Account doesn't exist");
+        Account memory account = accounts[_target];
+        return account.value;
+    }
+
+    //Vote Admin---------------------------------------------------
     struct proposedAdmin {
         string name;
         bool exist;

@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "./AccountManager.sol";
 
 contract Timelock {
-   constructor(
+    constructor(
         address _accountsContractAddress,
         uint256 _minGracePeriod,
         uint256 _maxGracePeriod,
@@ -16,10 +16,11 @@ contract Timelock {
         gracePeriod = _defaultGracePeriod;
     }
 
-    //Transaction
+    //Transaction--------------------------------------------------------------
     error AlreadyQueuedError(bytes32 txId);
     error NotQueuedError(bytes32 txId);
     error TimestampNotPassedError(uint256 blockTimestamp, uint256 timestamp);
+    error TimestampNotMatureError(uint256 blockTimestamp, uint256 expiresAt);
     error TimestampExpiredError(uint256 blockTimestamp, uint256 expiresAt);
     error TxFailedError();
     error NotAdminError();
@@ -46,6 +47,7 @@ contract Timelock {
         uint256 value;
         uint256 timestamp;
         bool queued;
+        address depositor;
     }
 
     // Mapping of transaction IDs to transaction data
@@ -59,20 +61,6 @@ contract Timelock {
     uint256 public depositAmt;
     uint256 public accountBalance;
 
-    receive() external payable {
-        accountBalance += msg.value;
-        whoDeposited = msg.sender;
-        depositAmt = msg.value;
-        emit Deposited(msg.sender, msg.value);
-    }
-
-    fallback() external payable {
-        accountBalance += msg.value;
-        whoDeposited = msg.sender;
-        depositAmt = msg.value;
-        emit Deposited(msg.sender, msg.value);
-    }
-
     function getGracePeriod() public view returns (uint256) {
         return gracePeriod;
     }
@@ -85,11 +73,12 @@ contract Timelock {
         return keccak256(abi.encode(_target, _value));
     }
 
-    function queue(address _target, uint256 _value)
-        external
-        
-        returns (bytes32)
-    {
+    function queue(address _target, uint256 _value) external returns (bytes32) {
+        require(_value > 0, "Ether value must be greater than 0.");
+        require(
+            accountsContract.getAccountDeposit(msg.sender) > _value,
+            "Insufficient Balance"
+        );
         // Generate the transaction ID based on the target and value
         bytes32 txId = getTxId(_target, _value);
 
@@ -99,20 +88,26 @@ contract Timelock {
         }
 
         // Store the new transaction
-        Tx memory currentTx = Tx(txId, _target, _value, block.timestamp, true);
+        Tx memory currentTx = Tx(
+            txId,
+            _target,
+            _value,
+            block.timestamp,
+            true,
+            msg.sender
+        );
         txs[txId] = currentTx;
-
+        uint256 newAmount = accountsContract.getAccountDeposit(msg.sender) -
+            _value;
         // Emit the Queue event
         emit Queue(txId, _target, _value, block.timestamp);
-
+        accountsContract.depositUpdate(msg.sender, newAmount);
         return txId;
     }
 
     function execute(bytes32 _txId)
         external
-        payable
-        
-        returns (bytes memory)
+        returns (address target, uint256 value)
     {
         // Ensure the transaction is actually queued
         if (!txs[_txId].queued) {
@@ -129,9 +124,9 @@ contract Timelock {
             );
         }
 
-        // Ensure the transaction is executed within the grace period
-        if (block.timestamp > currentTx.timestamp + gracePeriod) {
-            revert TimestampExpiredError(
+        // Ensure the transaction is executed after the grace period
+        if (block.timestamp < currentTx.timestamp + gracePeriod) {
+            revert TimestampNotMatureError(
                 block.timestamp,
                 currentTx.timestamp + gracePeriod
             );
@@ -139,12 +134,16 @@ contract Timelock {
 
         // Mark the transaction as executed
         txs[_txId].queued = false;
-
         // Execute the transaction using the .call function
-        (bool ok, bytes memory res) = currentTx.target.call{
-            value: currentTx.value
-        }("");
-        if (!ok) {
+
+        uint256 newAmount = accountsContract.getAccountDeposit(
+            currentTx.target
+        ) + currentTx.value;
+        bool success = accountsContract.depositUpdate(
+            currentTx.target,
+            newAmount
+        );
+        if (!success) {
             revert TxFailedError();
         }
 
@@ -156,20 +155,41 @@ contract Timelock {
             currentTx.timestamp
         );
 
-        return res;
+        return (currentTx.target, currentTx.value);
     }
 
-    function cancel(bytes32 _txId) external  {
+    function cancel(bytes32 _txId)
+        external
+        returns (address sender, uint256 value)
+    {
         // Ensure the transaction is queued
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
         }
 
+        Tx memory currentTx = txs[_txId];
+        // Ensure the transaction is executed in the grace period
+        if (block.timestamp >= currentTx.timestamp + gracePeriod) {
+            revert TimestampExpiredError(
+                block.timestamp,
+                currentTx.timestamp + gracePeriod
+            );
+        }
         // Mark the transaction as canceled
+
         txs[_txId].queued = false;
 
+        uint256 newAmount = accountsContract.getAccountDeposit(
+            currentTx.depositor
+        ) + currentTx.value;
+        bool success = accountsContract.depositUpdate(
+            currentTx.depositor,
+            newAmount
+        );
         // Emit the Cancel event
         emit Cancel(_txId);
+        require(success, "Failed to return Ether to depositor");
+        return (currentTx.depositor, currentTx.value);
     }
 
     function getTx(bytes32 _txId)
@@ -180,14 +200,7 @@ contract Timelock {
         return txs[_txId];
     }
 
-    // Function to withdraw Ether from the contract (only admin)
-    function withdraw(uint256 _amount) external  {
-        require(_amount <= accountBalance, "Insufficient contract balance");
-        accountBalance -= _amount;
-        payable(msg.sender).transfer(_amount);
-    }
-
-    //Grace Period Changing
+    //Grace Period Voting-------------------------------------------------
     AccountManager public accountsContract;
     event NewGracePeriodProposed(uint256 newGracePeriod);
     event GracePeriodChanged(uint256 gracePeriod);
@@ -235,6 +248,7 @@ contract Timelock {
             "Proposed grace Period Out of range"
         );
         require(!votingActive, "Voting is already active.");
+        resetVoting();
         votingStartTime = block.timestamp;
         votingEndTime = block.timestamp + 120; // Total of 2 minutes
 
@@ -250,8 +264,8 @@ contract Timelock {
         voteThreshold = (totalRegisteredUsers * 51 + 99) / 100; // Equivalent to rounding up (51% rule)
     }
 
-    function voteForAdmin() public duringVotingPhase {
-        require(proposedGracePeriod != 0, "No admin proposed.");
+    function voteGracePeriod() public duringVotingPhase {
+        require(proposedGracePeriod != 0, "No Grace Period proposed.");
         require(
             accountsContract.accountExists(msg.sender),
             "Only registered users can vote."
@@ -262,7 +276,7 @@ contract Timelock {
 
         // Check if vote threshold has been met
         if (getTotalVotes() >= voteThreshold) {
-            finalizeVote();
+            finalizeGPByThresHold(proposedGracePeriod);
         }
     }
 
@@ -276,13 +290,23 @@ contract Timelock {
         return false;
     }
 
-    // FINALIZE the voting process after 10 minutes
+    function finalizeGPByThresHold(uint256 _proposedGracePeriod) internal {
+        gracePeriod = _proposedGracePeriod;
+
+        emit VotingFinalized(_proposedGracePeriod);
+        resetVoting();
+    }
+
+    // FINALIZE the voting process after 2 minutes
     function finalizeVote() public afterVotingPhase {
         require(proposedGracePeriod != 0, "No proposed grace period.");
-
-        gracePeriod = proposedGracePeriod;
-        emit GracePeriodChanged(proposedGracePeriod);
-        emit VotingFinalized(proposedGracePeriod);
+        if (getTotalVotes() >= voteThreshold) {
+            finalizeGPByThresHold(proposedGracePeriod);
+            emit GracePeriodChanged(proposedGracePeriod);
+            emit VotingFinalized(proposedGracePeriod);
+        } else {
+            require(false, "Total Votes is not reached the threshold");
+        }
 
         resetVoting();
     }
