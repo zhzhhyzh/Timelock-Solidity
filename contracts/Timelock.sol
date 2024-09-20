@@ -247,6 +247,7 @@ contract Timelock {
                 _proposedGracePeriod <= maxGracePeriod),
             "Proposed grace Period Out of range"
         );
+        require(_proposedGracePeriod != gracePeriod, "Proposed grace period same with current grace period");
         require(!votingActive, "Voting is already active.");
         resetVoting();
         votingStartTime = block.timestamp;
@@ -270,7 +271,7 @@ contract Timelock {
             accountsContract.accountExists(msg.sender),
             "Only registered users can vote."
         );
-        require(voterHasVoted(msg.sender), "Already voted.");
+        require(!voterHasVoted(msg.sender), "Already voted.");
 
         voted.push(msg.sender);
 
