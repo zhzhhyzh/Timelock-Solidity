@@ -9,6 +9,7 @@ contract AccountManager {
         string name;
         string email;
         bool exist;
+        uint256 value;
     }
 
     uint256 public totalAccounts = 0;
@@ -19,9 +20,16 @@ contract AccountManager {
     address[] public accountAddresses;
 
     // Events
-    event AccountCreated(address indexed user, string name, string email);
+    event AccountCreated(
+        address indexed user,
+        string name,
+        string email,
+        uint256 value
+    );
     event AccountPurged(address indexed user);
-
+    event DepositMade(address indexed user, uint256 amount);
+    event WithdrawalMade(address indexed user, uint256 amount);
+    event DepositUpdated(address indexed user, uint256 newAmount);
     // Modifiers
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not Contract Admin");
@@ -69,12 +77,13 @@ contract AccountManager {
             userAddress: _user,
             name: _name,
             email: _email,
-            exist: true
+            exist: true,
+            value: 0
         });
         accountAddresses.push(_user); // Add the user's address to the array
         totalAccounts++;
 
-        emit AccountCreated(_user, _name, _email);
+        emit AccountCreated(_user, _name, _email, 0);
     }
 
     function purgeAccount(address _user) public onlyAdmin {
@@ -100,11 +109,56 @@ contract AccountManager {
         public
         view
         onlyAdmin
-        returns (string memory name, string memory email)
+        returns (
+            string memory name,
+            string memory email,
+            uint256 value
+        )
     {
         require(accounts[_user].exist, "Account doesn't exist");
         Account memory account = accounts[_user];
-        return (account.name, account.email);
+        return (account.name, account.email, account.value);
+    }
+
+    function deposit() public payable {
+        require(accounts[msg.sender].exist, "Account doesn't exist");
+        require(msg.value > 0, "You need to deposit some Ether");
+
+        // Update the user's balance
+        accounts[msg.sender].value += msg.value;
+
+        // Emit the DepositMade event
+        emit DepositMade(msg.sender, msg.value);
+    }
+
+    function withdraw(uint256 _amount) public {
+        require(accounts[msg.sender].exist, "Account doesn't exist");
+        require(_amount > 0, "Withdraw amount must be greater than zero");
+        require(accounts[msg.sender].value >= _amount, "Insufficient balance");
+
+        // Deduct the withdrawn amount from the user's balance
+        accounts[msg.sender].value -= _amount;
+
+        // Transfer the Ether back to the user
+        (bool success, ) = msg.sender.call{value: _amount}("");
+        require(success, "Withdrawal failed");
+
+        // Emit the WithdrawalMade event
+        emit WithdrawalMade(msg.sender, _amount);
+    }
+
+    function depositUpdate(address _user, uint256 _newAmount) public onlyAdmin {
+        require(accounts[_user].exist, "Account doesn't exist");
+
+        // Update the user's value to the new amount
+        accounts[_user].value = _newAmount;
+
+        // Emit the DepositUpdated event
+        emit DepositUpdated(_user, _newAmount);
+    }
+
+    function getContractBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 
     //Vote Admin
@@ -122,6 +176,7 @@ contract AccountManager {
     bool private votingActive;
     uint256 proposedAdminsCounts;
     address[] public voted;
+    event StartVoting();
     event AdminChanged(address indexed newAdmin);
     modifier duringProposalPhase() {
         require(
@@ -175,6 +230,7 @@ contract AccountManager {
 
         votingActive = true;
         updateVoteThreshold();
+        emit StartVoting();
     }
 
     function updateVoteThreshold() internal {
