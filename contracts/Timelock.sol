@@ -3,15 +3,17 @@ pragma solidity ^0.8.0;
 import "./AccountManager.sol";
 
 contract Timelock {
-    constructor(
+   constructor(
         address _accountsContractAddress,
         uint256 _minGracePeriod,
-        uint256 _maxGracePeriod
+        uint256 _maxGracePeriod,
+        uint256 _defaultGracePeriod
     ) {
         // admin = msg.sender;
         accountsContract = AccountManager(_accountsContractAddress);
         minGracePeriod = _minGracePeriod;
         maxGracePeriod = _maxGracePeriod;
+        gracePeriod = _defaultGracePeriod;
     }
 
     //Transaction
