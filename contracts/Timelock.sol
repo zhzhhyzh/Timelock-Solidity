@@ -65,11 +65,10 @@ contract Timelock {
         return gracePeriod;
     }
 
-    function getTxId(address _target, uint256 _value)
-        public
-        pure
-        returns (bytes32)
-    {
+    function getTxId(
+        address _target,
+        uint256 _value
+    ) public pure returns (bytes32) {
         return keccak256(abi.encode(_target, _value));
     }
 
@@ -105,10 +104,9 @@ contract Timelock {
         return txId;
     }
 
-    function execute(bytes32 _txId)
-        external
-        returns (address target, uint256 value)
-    {
+    function execute(
+        bytes32 _txId
+    ) external returns (address target, uint256 value) {
         // Ensure the transaction is actually queued
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
@@ -158,10 +156,9 @@ contract Timelock {
         return (currentTx.target, currentTx.value);
     }
 
-    function cancel(bytes32 _txId)
-        external
-        returns (address sender, uint256 value)
-    {
+    function cancel(
+        bytes32 _txId
+    ) external returns (address sender, uint256 value) {
         // Ensure the transaction is queued
         if (!txs[_txId].queued) {
             revert NotQueuedError(_txId);
@@ -192,11 +189,9 @@ contract Timelock {
         return (currentTx.depositor, currentTx.value);
     }
 
-    function getTx(bytes32 _txId)
-        external
-        view
-        returns (Tx memory transaction)
-    {
+    function getTx(
+        bytes32 _txId
+    ) external view returns (Tx memory transaction) {
         return txs[_txId];
     }
 
@@ -247,7 +242,10 @@ contract Timelock {
                 _proposedGracePeriod <= maxGracePeriod),
             "Proposed grace Period Out of range"
         );
-        require(_proposedGracePeriod != gracePeriod, "Proposed grace period same with current grace period");
+        require(
+            _proposedGracePeriod != gracePeriod,
+            "Proposed grace period same with current grace period"
+        );
         require(!votingActive, "Voting is already active.");
         resetVoting();
         votingStartTime = block.timestamp;
@@ -306,7 +304,7 @@ contract Timelock {
             emit GracePeriodChanged(proposedGracePeriod);
             emit VotingFinalized(proposedGracePeriod);
         } else {
-            require(false, "Total Votes is not reached the threshold");
+            // require(false, "Total Votes is not reached the threshold");
         }
 
         resetVoting();
@@ -314,6 +312,10 @@ contract Timelock {
 
     function getCurrentGracePeriod() public view returns (uint256) {
         return gracePeriod;
+    }
+
+    function getProposedGracePeriod() public view returns (uint256) {
+        return proposedGracePeriod;
     }
 
     function resetVoting() internal {

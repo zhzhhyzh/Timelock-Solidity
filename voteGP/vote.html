@@ -95,7 +95,7 @@
 
      <div  class="proposed-grace-period">
         <h1>Proposed Grace Period: </h1>
-          <h1  >100 seconds</h1>
+          <h1 ><span id= 'proposedGP'></span> seconds</h1>
         </div>
        
         <div class="clearfix">
@@ -112,6 +112,11 @@
    
     </div>
   </body>
+  <script src="../scripts/config.js"></script>
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/gracePeriodVoting.js"></script>
+ 
+  <script src="../scripts/navbar.js"></script>
   <script>
     let _vote = async () => {
      
@@ -121,9 +126,15 @@
       
       await resetVoting();
     };
-  </script>
-  <script src="../scripts/accountManager.js"></script>
+    let _getProposedGP = async () => {
+      let pgp = await getProposedGracePeriod()
+      document.getElementById( "proposedGP").innerText = pgp != 0 ? pgp : "--"
+    };
+    setTimeout(()=>{
+      _getProposedGP()
 
-  <script src="../scripts/config.js"></script>
-  <script src="../scripts/navbar.js"></script>
+  },1000)
+
+  </script>
+
 </html>

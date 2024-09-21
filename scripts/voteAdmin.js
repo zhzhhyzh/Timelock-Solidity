@@ -1,31 +1,93 @@
-
 const proposeAdmin = async (address) => {
-  const data = await voteAdminContract.methods
-    .proposeAdmin(
-      address
-    )
-    .send({ from: account });
-  console.log(data);
-};
-const finalizeAdmin = async () => {
-  const data = await voteAdminContract.methods
-    .finalizeAdmin(
-  )
-    .send({ from: account });
-  console.log(data);
+  try {
+    const data = await accountManagerContract.methods
+      .proposeAdmin(address)
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .startVoting(address)
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
 };
 const startVoting = async () => {
-  const data = await voteAdminContract.methods
-    .startVoting(
-  )
-    .send({ from: account });
-  console.log(data);
+  try {
+    const data = await accountManagerContract.methods
+      .startVoting()
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .startVoting()
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+};
+const vote = async (address) => {
+  try {
+    const data = await accountManagerContract.methods
+      .voteForAdmin(address)
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .voteForAdmin(address)
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+ 
+};
+const resetVoting = async () => {
+  try {
+    const data = await accountManagerContract.methods
+      .finalizeAdmin()
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .finalizeAdmin()
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+ 
+};
+const getProposed = async () => {
+  try {
+    const data = await accountManagerContract.methods
+      .getProposedAdmins()
+      .call({ from: account });
+    return data;
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+
+};
+const getCurrentAdmin = async () => {
+  try {
+    const data = await accountManagerContract.methods
+      .getAdmin()
+      .call({ from: account });
+    return data;
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+
 };
 
-const voteForAdmin = async () => {
-  const data = await voteAdminContract.methods
-    .voteForAdmin(
-  )
-    .send({ from: account });
-  console.log(data);
-};

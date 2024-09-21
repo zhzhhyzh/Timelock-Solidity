@@ -1,18 +1,21 @@
-
-const createAccount = async (address,name, email) => {
-  const data = await accountManagerContract.methods
-    .createAccount(
-        address,
-      name,
-      email
-    )
-    .send({ from: account });
-  console.log(data);
+const createAccount = async (address, name, email) => {
+  try {
+    const data = await accountManagerContract.methods
+      .createAccount(address, name, email)
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .createAccount(address, name, email)
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
 };
 const getAccountCount = async () => {
-  const data = await accountManagerContract.methods
-    .getAccountCount()
-    .call();
+  const data = await accountManagerContract.methods.getAccountCount().call();
 
   console.log(data, "HERE");
 };
@@ -21,29 +24,40 @@ const getAccountDetails = async (address) => {
     const data = await accountManagerContract.methods
       .getAccountDetails(address)
       .call({ from: account });
-      console.log(data)
-    return data
+    console.log(data);
+    return data;
   } catch (err) {
-    console.log(generateErrorMessage(err))
+    alert(generateErrorMessage(err));
     // // Decode the revert reason (skipping the first 4 bytes)
   }
 };
 const purgeAccount = async (_user) => {
-  const data = await accountManagerContract.methods
-    .purgeAccount(_user)
-    .send({ from: account });
-  console.log(data);
+  try {
+    const data = await accountManagerContract.methods
+      .purgeAccount(_user)
+      .call({ from: account })
+      .then(async () => {
+        const data = await accountManagerContract.methods
+          .purgeAccount(_user)
+          .send({ from: account });
+        alert("Successful");
+      });
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
 };
-
-const generateErrorMessage = (err) => {
-  const result = String(err).match(/{([^}]+)}/)[1];
-  const json = JSON.parse("{" + result + "}");
-  const decoded = web3.eth.abi.decodeParameter(
-    "string",
-    json.data.slice(10)
-  );
-  // Output the decoded message
-  return decoded
+const listAccounts = async (_user) => {
+  try {
+    const data = await accountManagerContract.methods
+      .getAllAccounts()
+      .call({ from: account });
+    console.log(data);
+    return data;
+  } catch (err) {
+    alert(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
 };
 
 //     //3-read data from smart contract

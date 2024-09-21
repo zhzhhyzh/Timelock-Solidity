@@ -104,15 +104,12 @@ contract AccountManager {
         emit AccountPurged(_user);
     }
 
-    function getAccountDetails(address _user)
+    function getAccountDetails(
+        address _user
+    )
         public
         view
-        
-        returns (
-            string memory name,
-            string memory email,
-            uint256 value
-        )
+        returns (string memory name, string memory email, uint256 value)
     {
         require(accounts[_user].exist, "Account doesn't exist");
         Account memory account = accounts[_user];
@@ -146,7 +143,10 @@ contract AccountManager {
         emit WithdrawalMade(msg.sender, _amount);
     }
 
-    function depositUpdate(address _user, uint256 _newAmount) public  returns (bool success) {
+    function depositUpdate(
+        address _user,
+        uint256 _newAmount
+    ) public returns (bool success) {
         require(accounts[_user].exist, "Account doesn't exist");
 
         // Update the user's value to the new amount
@@ -161,11 +161,9 @@ contract AccountManager {
         return address(this).balance;
     }
 
-    function getAccountDeposit(address _target)
-        public
-        view
-        returns (uint256 value)
-    {
+    function getAccountDeposit(
+        address _target
+    ) public view returns (uint256 value) {
         require(accounts[_target].exist, "Account doesn't exist");
         Account memory account = accounts[_target];
         return account.value;
@@ -232,7 +230,8 @@ contract AccountManager {
         _;
     }
 
-    function startVoting() public onlyAdmin {
+    // Zheheng's version
+    function startVoting() public {
         require(!votingActive, "Voting is already active.");
         votingStartTime = block.timestamp;
         proposalDeadline = block.timestamp + 60; // First 1 minutes for proposing
@@ -243,16 +242,30 @@ contract AccountManager {
         emit StartVoting();
     }
 
+    // quinton's
+    // function startVoting() internal {
+    //     // require(!votingActive, "Voting is already active.");
+    //     votingStartTime = block.timestamp;
+    //     proposalDeadline = block.timestamp + 60; // First 1 minutes for proposing
+    //     votingEndTime = block.timestamp + 120; // Total of 2 minutes
+
+    //     votingActive = true;
+    //     updateVoteThreshold();
+    //     emit StartVoting();
+    // }
+
     function updateVoteThreshold() internal {
         uint256 totalRegisteredUsers = getAccountCount();
         voteThreshold = (totalRegisteredUsers * 51 + 99) / 100; // Equivalent to rounding up (51% rule)
     }
 
-    function proposeAdmin(address _admin)
-        public
-        duringProposalPhase
-        adminProposedRestrict
-    {
+    function proposeAdmin(
+        address _admin
+    ) public duringProposalPhase adminProposedRestrict {
+        // if (!votingActive) {
+        //     startVoting();
+        // }
+
         require(
             accounts[_admin].exist,
             "Address is not in the Account contract"
@@ -263,11 +276,9 @@ contract AccountManager {
         proposedAdminsCounts++;
     }
 
-    function voteForAdmin(address _admin)
-        public
-        duringVotingPhase
-        checkAdminProposed
-    {
+    function voteForAdmin(
+        address _admin
+    ) public duringVotingPhase checkAdminProposed {
         require(accountExists(msg.sender), "Only registered users can vote.");
         require(!voterHasVoted(msg.sender), "Already voted.");
         voted.push(msg.sender);
@@ -276,6 +287,21 @@ contract AccountManager {
         if (proposedAdmins[_admin].votes >= voteThreshold) {
             finalizeAdminByThresHold(_admin);
         }
+    }
+    function getProposedAdmins() public view returns (proposedAdmin[] memory) {
+        proposedAdmin[] memory admins = new proposedAdmin[](
+            proposedAdminsCounts
+        );
+        uint256 count = 0;
+
+        for (uint256 i = 0; i < accountAddresses.length; i++) {
+            if (proposedAdmins[accountAddresses[i]].exist) {
+                admins[count] = proposedAdmins[accountAddresses[i]];
+                count++;
+            }
+        }
+
+        return admins;
     }
 
     function finalizeAdminByThresHold(address _admin) internal {

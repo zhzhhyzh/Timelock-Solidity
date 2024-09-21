@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Account</title>
+    <title>Vote Grace Period</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -90,24 +90,18 @@
 
     <form onsubmit="return false">
       <div class="container">
-        <h1>Create Account</h1>
-        <p>Please fill in this form to create an account.</p>
+          <!-- <h1>Vote</h1>
+          <p>Cast your vote for the proposed grace period</p> -->
 
-        <label for="address"><b>Account Address</b></label>
-        <input
-          type="text"
-          name="address"
-          placeholder="Enter Account Address"
-          required
-        />
-        <label for="email"><b>Name</b></label>
-        <input type="text" name="username" placeholder="Enter Name" required />
-        <label for="email"><b>Email</b></label>
-        <input type="text" placeholder="Enter Email" name="email" required />
-
-        <div class="clearfix">
-          <button onclick="_createAccountfunction()" class="btn">Create</button>
+     <div  class="proposed-grace-period">
+        <h1>Current Admin's Address: </h1>
+          <h5 ><span id= 'currentAdmin'></span></h5>
         </div>
+       
+        <!-- <div class="clearfix">
+          <button onclick="_vote()" class="btn">Vote to Accept</button>
+          <button onclick="_resetVoting()" class="btn-cancel">End Voting</button>
+        </div> -->
       </div>
     </form>
     <div class="avatars">
@@ -118,17 +112,23 @@
    
     </div>
   </body>
-  <script>
-    let _createAccountfunction = async () => {
-      let name = document.forms[0].username.value;
-      let email = document.forms[0].email.value;
-      let address = document.forms[0].address.value;
-      await createAccount(address, name, email);
-    };
-  </script>
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/accountManager.js"></script>
-
   <script src="../scripts/config.js"></script>
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/voteAdmin.js"></script>
+ 
   <script src="../scripts/navbar.js"></script>
+  <script>
+  
+  setTimeout(()=>{
+    _getAdmin()
+
+  },1000)
+    let _getAdmin = async () => {
+      
+      document.getElementById( "currentAdmin").innerText = await getCurrentAdmin()
+      };
+
+
+  </script>
+
 </html>
