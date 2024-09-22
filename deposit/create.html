@@ -160,6 +160,7 @@
   <script>
     let _depositFunc = async () => {
       let value = document.forms[0].value.value;
+      value *= 1000000000000000000
       await deposit(value);
     };
   </script>

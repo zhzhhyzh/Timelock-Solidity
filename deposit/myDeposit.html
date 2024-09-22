@@ -126,6 +126,7 @@
         <h1>Your Current Balance: </h1>
           <h5 ><span id= 'currentBalance'></span> ETH</h5>
         </div>
+
        
         <!-- <div class="clearfix">
           <button onclick="_vote()" class="btn">Vote to Accept</button>
@@ -156,7 +157,7 @@
   </body>
   <script src="../scripts/config.js"></script>
   <script src="../scripts/common.js"></script>
-  <script src="../scripts/voteAdmin.js"></script>
+  <script src="../scripts/deposit.js"></script>
  
   <script src="../scripts/navbar.js"></script>  <script src="../scripts/automation.js"></script>
 
@@ -168,7 +169,7 @@
   },1000)
     let _getCurrentBalance = async () => {
       
-      document.getElementById( "currentBalance").innerText = await getMyDeposit()
+      document.getElementById( "currentBalance").innerText = await getMyDeposit()/1000000000000000000
       };
 
 

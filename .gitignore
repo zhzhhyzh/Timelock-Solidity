@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+/migrations/2_deploy_contracts.js
+/build/contracts/AccountManager.json
+/build/contracts/Timelock.json
+
+

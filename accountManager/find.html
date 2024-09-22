@@ -134,6 +134,9 @@
         <label for="email"><b>Email</b></label>
         <input type="text" readonly placeholder="Enter Email" name="email" required />
 
+        <label for="value"><b>Value</b></label>
+        <input type="text" readonly placeholder="Enter Value" name="value" required />
+
         <div class="clearfix">
           <button onclick="_getAccountDetails()" class="btn">Search</button>
         </div>
@@ -163,9 +166,11 @@
   <script>
     let _getAccountDetails = async() => {
       let address = document.forms[0].address.value;
-      let { name, email } = await getAccountDetails(address);
+      let { name, email,value } = await getAccountDetails(address);
       document.forms[0].username.value = name
       document.forms[0].email.value = email
+      value/=1000000000000000000
+      document.forms[0].value.value = value
     };
   </script>
   <script src="../scripts/common.js"></script>
