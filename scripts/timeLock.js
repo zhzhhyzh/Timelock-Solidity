@@ -12,6 +12,7 @@ const queue = async (address, _value) => {
         document.forms[0].txId.value = _txId;
       });
   } catch (err) {
+    console.log(err)
     alert(generateErrorMessage(err));
     // // Decode the revert reason (skipping the first 4 bytes)
   }

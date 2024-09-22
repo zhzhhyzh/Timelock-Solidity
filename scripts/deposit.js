@@ -10,6 +10,7 @@ const deposit = async (value) => {
         alert("Successful");
       });
   } catch (err) {
+    console.log(err)
     alert(generateErrorMessage(err));
     // // Decode the revert reason (skipping the first 4 bytes)
   }
