@@ -37,7 +37,6 @@ contract AccountManager {
 
     constructor() {
         admin = msg.sender;
-        accounts[msg.sender] = Account(msg.sender,"Admin","admin@gmail.com",true,0);
     }
 
     function getAdmin() public view returns (address) {

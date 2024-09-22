@@ -17,103 +17,84 @@
       <nav class="nav">
         <div>
           <div class="nav__brand">
-            <ion-icon
-              name="menu-outline"
-              class="nav__toggle"
-              id="nav-toggle"
-            ></ion-icon>
+            <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
             <a href="#" class="nav__logo">Timelock</a>
           </div>
-        
-            <div class="nav__link collapse">
-              <ion-icon name="key-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Accounts</span>
 
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
+          <div class="nav__link collapse">
+            <ion-icon name="key-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Accounts</span>
 
-              <ul class="collapse__menu">
-                <a href="../accountManager/create.html" class="collapse__sublink">Create</a>
-                <a href="../accountManager/find.html" class="collapse__sublink">Search</a>
-                <a href="../accountManager/list.html" class="collapse__sublink">List</a>
-                <a href="../accountManager/purge.html" class="collapse__sublink">Purge</a>
-              </ul>
-            </div>
-            <div class="nav__link collapse">
-              <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
 
-              <span class="nav__name">Deposit</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
-                <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
-                <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
-                <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
-              
-              </ul>
-            </div>
-            <div class="nav__link collapse active">
-              <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Timelock</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../timelock/list.html" class="collapse__sublink">List</a>
-                <a href="../timelock/queue.html" class="collapse__sublink">Queue</a>
-                <a href="../timelock/execute.html" class="collapse__sublink">Execute</a>
-                <a href="../timelock/cancel.html" class="collapse__sublink">Cancel</a>
-              
-              </ul>
-            </div>
-            <div class="nav__link collapse">
-              <ion-icon name="person-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Admin Config</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../voteAdmin/currentAdmin.html" class="collapse__sublink">Current Admin</a>
-                <a href="../voteAdmin/propose.html" class="collapse__sublink">Propose New Admin</a>
-                <a href="../voteAdmin/vote.html" class="collapse__sublink">Voting</a>                
-              </ul>
-            </div>
-            <div class="nav__link collapse">
-              <ion-icon name="stopwatch-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">GP Config</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../voteGP/currentGP.html" class="collapse__sublink">Current Grace Period</a>
-                <a href="../voteGP/propose.html" class="collapse__sublink">Propose New Grace Period</a>
-                <a href="../voteGP/vote.html" class="collapse__sublink">Voting</a>                
-              </ul>
-            </div>
-
-          
+            <ul class="collapse__menu">
+              <a href="../accountManager/create.html" class="collapse__sublink">Create</a>
+              <a href="../accountManager/find.html" class="collapse__sublink">Search</a>
+              <a href="../accountManager/list.html" class="collapse__sublink">List</a>
+              <a href="../accountManager/purge.html" class="collapse__sublink">Purge</a>
+            </ul>
           </div>
-        </div>
+          <div class="nav__link collapse">
+            <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
 
-  
-      </nav>
+            <span class="nav__name">Deposit</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
+              <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
+              <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
+              <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
+
+            </ul>
+          </div>
+          <div class="nav__link collapse active">
+            <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Timelock</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../timelock/list.html" class="collapse__sublink">List</a>
+              <a href="../timelock/queue.html" class="collapse__sublink">Queue</a>
+              <a href="../timelock/execute.html" class="collapse__sublink">Execute</a>
+              <a href="../timelock/cancel.html" class="collapse__sublink">Cancel</a>
+
+            </ul>
+          </div>
+          <div class="nav__link collapse">
+            <ion-icon name="person-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Admin Config</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../voteAdmin/currentAdmin.html" class="collapse__sublink">Current Admin</a>
+              <a href="../voteAdmin/propose.html" class="collapse__sublink">Propose New Admin</a>
+              <a href="../voteAdmin/vote.html" class="collapse__sublink">Voting</a>
+            </ul>
+          </div>
+          <div class="nav__link collapse">
+            <ion-icon name="stopwatch-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">GP Config</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../voteGP/currentGP.html" class="collapse__sublink">Current Grace Period</a>
+              <a href="../voteGP/propose.html" class="collapse__sublink">Propose New Grace Period</a>
+              <a href="../voteGP/vote.html" class="collapse__sublink">Voting</a>
+            </ul>
+          </div>
+
+
+        </div>
     </div>
+
+
+    </nav>
+  </div>
   </div>
 
   <form onsubmit="return false">
@@ -123,14 +104,14 @@
 
       <label for="address"><b>Target Address</b></label>
       <input type="text" name="address" placeholder="Enter Target Address" required />
-      <label for="_value"><b>Transaction Amount</b> <b> (ETH)</b></label>
-      <input type="text"  name="_value" placeholder="Enter Transaction Amount" required />
+      <label for="_value"><b>Transaction Amount</b> <b> (Wei)</b></label>
+      <input type="text" name="_value" placeholder="Enter Transaction Amount" required />
       <!-- <label for="_value"><b>Automated execution?</b></label><br>
         <input type="checkbox"  name="automation" value="true"  /><br> -->
-        <label for="txId"><b>Generated Transaction Id</b></label>
-        <input type="text" readonly  name="txId" placeholder=" "  />
-     
-     
+      <label for="txId"><b>Generated Transaction Id</b></label>
+      <input type="text" readonly name="txId" placeholder=" " />
+
+
       <div class="clearfix">
         <button onclick="_queuefunction()" class="btn">Queue</button>
       </div>
@@ -162,7 +143,6 @@
 
     let address = document.forms[0].address.value;
     let _value = document.forms[0]._value.value;
-  
     await queue(address, _value);
 
 
@@ -174,7 +154,8 @@
 <script src="../scripts/common.js"></script>
 
 <script src="../scripts/config.js"></script>
-<script src="../scripts/navbar.js"></script>  <script src="../scripts/automation.js"></script>
+<script src="../scripts/navbar.js"></script>
+<script src="../scripts/automation.js"></script>
 
 <script src="../scripts/automation.js" type="module"></script>
 
