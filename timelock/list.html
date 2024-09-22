@@ -79,7 +79,7 @@
               </div>
               <div class="nav__link collapse">
                 <ion-icon name="person-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Admin Config</span>
+                <span class="nav__name">Admin Configuration</span>
 
                 <ion-icon
                   name="chevron-down-outline"
@@ -94,7 +94,7 @@
               </div>
               <div class="nav__link collapse">
                 <ion-icon name="stopwatch-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">GP Config</span>
+                <span class="nav__name">GP Configuration</span>
 
                 <ion-icon
                   name="chevron-down-outline"
@@ -104,7 +104,7 @@
                 <ul class="collapse__menu">
                   <a href="../voteGP/currentGP.html" class="collapse__sublink">Current Grace Period</a>
                   <a href="../voteGP/propose.html" class="collapse__sublink">Propose New Grace Period</a>
-                  <a href="../voteGP/vote.html" class="collapse__sublink">Voting</a>                
+                  <a href="../voteGP/currentAdmin.html" class="collapse__sublink">Voting</a>                
                 </ul>
               </div>
 
@@ -163,7 +163,7 @@
           <th>Transaction Id</th>
           <th>Target Address</th>
           <th>Depositor Address</th>
-                    <th style='  text-align: right; '>Tx Value (ETH)</th>
+                    <th style='  text-align: right; '>Tx Value (WEI)</th>
 
         </tr>
       </thead>
@@ -175,7 +175,7 @@
           <td>${obj[0]}</td>
           <td>${obj[1]}</td>
           <td>${obj[5]}</td>
-          <td style='  text-align: right; '>${obj[2]/1000000000000000000}</td>
+          <td style='  text-align: right; '>${obj[2]}</td>
       
         </tr>`
         )
