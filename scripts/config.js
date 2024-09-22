@@ -50,6 +50,7 @@ const accessToContract = async () => {
   // const voteAdminAddress =
   //   "0x5e3f514a35B57313E9650936fA096CB64303F2F5";
   window.web3 = await new Web3(window.ethereum); //how to access to smart contract
+
   timelockContract = await new window.web3.eth.Contract(
     timelockABI,
     timelockAddress
@@ -58,6 +59,7 @@ const accessToContract = async () => {
     accountManagerABI,
     accountManagerAddress
   );
+console.log(web3.currentProvider)
 
   // voteAdminContract = await new window.web3.eth.Contract(
   //   voteAdminABI,

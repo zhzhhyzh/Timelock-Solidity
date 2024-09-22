@@ -81,10 +81,10 @@
 
       <label for="address"><b>Target Address</b></label>
       <input type="text" name="address" placeholder="Enter Target Address" required />
-      <label for="_value"><b>Transaction Amount</b></label>
+      <label for="_value"><b>Transaction Amount</b> <b> (ETH)</b></label>
       <input type="text"  name="_value" placeholder="Enter Transaction Amount" required />
-      <label for="_value"><b>Automated execution?</b></label><br>
-        <input type="checkbox"  name="automation" value="true"  /><br>
+      <!-- <label for="_value"><b>Automated execution?</b></label><br>
+        <input type="checkbox"  name="automation" value="true"  /><br> -->
         <label for="txId"><b>Generated Transaction Id</b></label>
         <input type="text" readonly  name="txId" placeholder=" "  />
      
@@ -126,10 +126,13 @@
 
   };
 </script>
+
+
 <script src="../scripts/timeLock.js"></script>
 <script src="../scripts/common.js"></script>
 
 <script src="../scripts/config.js"></script>
 <script src="../scripts/navbar.js"></script>
+<script src="../scripts/automation.js" type="module"></script>
 
 </html>

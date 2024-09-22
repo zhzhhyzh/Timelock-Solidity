@@ -28,6 +28,8 @@ const queue = async (address, _value) => {
 
 const execute = async (_txid) => {
   try {
+    
+    console.log(_txid)
     const data = await timelockContract.methods
       .execute(_txid)
       .call({ from: account })
@@ -35,9 +37,14 @@ const execute = async (_txid) => {
         const data = await timelockContract.methods
           .execute(_txid)
           .send({ from: account });
+
         alert("Successful");
       });
+
+      console.log(data)
+
   } catch (err) {
+    console.log(err)
     alert(generateErrorMessage(err));
     // // Decode the revert reason (skipping the first 4 bytes)
   }
@@ -80,6 +87,18 @@ const getTxId = async (address, _value) => {
   try {
     const data = await timelockContract.methods
       .getTxId(address, _value)
+      .call({ from: account });
+    console.log(data);
+    return data;
+  } catch (err) {
+    console.log(generateErrorMessage(err));
+    // // Decode the revert reason (skipping the first 4 bytes)
+  }
+};
+const getTxArr = async () => {
+  try {
+    const data = await timelockContract.methods
+      .getTxArr()
       .call({ from: account });
     console.log(data);
     return data;

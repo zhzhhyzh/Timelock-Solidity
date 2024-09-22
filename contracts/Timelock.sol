@@ -52,7 +52,8 @@ contract Timelock {
 
     // Mapping of transaction IDs to transaction data
     mapping(bytes32 => Tx) private txs;
-
+    mapping(uint => bytes32) private indexToTxMapping;
+    uint txCount;
     address public admin;
 
     uint256 private gracePeriod;
@@ -67,9 +68,10 @@ contract Timelock {
 
     function getTxId(
         address _target,
-        uint256 _value
+        uint256 _value,
+        uint256 _timestamp
     ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_target, _value));
+        return keccak256(abi.encode(_target, _value,_timestamp));
     }
 
     function queue(address _target, uint256 _value) external returns (bytes32) {
@@ -79,7 +81,7 @@ contract Timelock {
             "Insufficient Balance"
         );
         // Generate the transaction ID based on the target and value
-        bytes32 txId = getTxId(_target, _value);
+        bytes32 txId = getTxId(_target, _value, block.timestamp);
 
         // Ensure the transaction is not already queued
         if (txs[txId].queued) {
@@ -96,12 +98,25 @@ contract Timelock {
             msg.sender
         );
         txs[txId] = currentTx;
+        indexToTxMapping[txCount] = txId;
+
         uint256 newAmount = accountsContract.getAccountDeposit(msg.sender) -
             _value;
         // Emit the Queue event
         emit Queue(txId, _target, _value, block.timestamp);
         accountsContract.depositUpdate(msg.sender, newAmount);
+        txCount++;
         return txId;
+    }
+
+    function getTxArr() public view returns (Tx[] memory) {
+        Tx[] memory arr = new Tx[](txCount);
+        for (uint i = 0; i < txCount; i++) {
+            if (txs[indexToTxMapping[i]].queued) {
+                arr[i] = txs[indexToTxMapping[i]];
+            }
+        }
+        return arr;
     }
 
     function execute(
@@ -321,7 +336,7 @@ contract Timelock {
     function resetVoting() internal {
         proposedGracePeriod = 0;
         votingActive = false;
-    votingEndTime = 0;
+        votingEndTime = 0;
         voted = new address[](0);
     }
 

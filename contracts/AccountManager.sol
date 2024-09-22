@@ -37,6 +37,7 @@ contract AccountManager {
 
     constructor() {
         admin = msg.sender;
+        accounts[msg.sender] = Account(msg.sender,"Admin","admin@gmail.com",true,0);
     }
 
     function getAdmin() public view returns (address) {
@@ -306,15 +307,15 @@ contract AccountManager {
             finalizeAdminByThresHold(_admin);
         }
     }
-    function getProposedAdmins() public view returns (proposedAdmin[] memory) {
-        proposedAdmin[] memory admins = new proposedAdmin[](
+    function getProposedAdmins() public view returns (Account[] memory) {
+        Account[] memory admins = new Account[](
             proposedAdminsCounts
         );
         uint256 count = 0;
 
         for (uint256 i = 0; i < accountAddresses.length; i++) {
             if (proposedAdmins[accountAddresses[i]].exist) {
-                admins[count] = proposedAdmins[accountAddresses[i]];
+                admins[count] = accounts[accountAddresses[i]];
                 count++;
             }
         }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Transaction</title>
+    <title>Account</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -89,25 +89,18 @@
     </div>
 
     <form onsubmit="return false">
-      <div class="container">
-        <h1>Execute Transaction</h1>
-        <p>Please fill in this form to execute transaction.</p>
+      <div class="container" style="width:auto">
+        <h1>Transaction Listing</h1>
+        <p>List of pending transactions.</p>
 
-        <label for="address"><b>Transaction Id</b></label>
-        <input
-          type="text"
-          name="address"
-          placeholder="Enter Transaction Id"
-          required
-        />
-   
+        <div id="table"></div>
 
         <div class="clearfix">
-          <button onclick="_executefunction()" class="btn">Execute</button>
+          <!-- <button onclick="_purgeAccount()" class="btn">Search</button> -->
         </div>
       </div>
     </form>
-  <div class="avatars" id="accounts">
+    <div class="avatars" id="accounts">
       <!-- <a href="#" onclick="switchAccount(0)" class="avatars__item"
         ><img
           class="avatar"
@@ -129,17 +122,50 @@
     </div>
   </body>
   <script>
-    let _executefunction = async () => {
-     
-      let address = document.forms[0].address.value;
-      await execute(address);
+    let _getTxArr = async () => {
+      // let address = document.forms[0].address.value;
+      let data = await getTxArr();
+      document.getElementById("table").innerHTML = `
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction Id</th>
+          <th>Target Address</th>
+          <th>Depositor Address</th>
+                    <th style='  text-align: right; '>Tx Value (ETH)</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        ${
+        data.map((obj)=>
+        data[4]
+       ` <tr>
+          <td>${obj[0]}</td>
+          <td>${obj[1]}</td>
+          <td>${obj[5]}</td>
+          <td style='  text-align: right; '>${obj[2]}</td>
+      
+        </tr>`
+        )
+        }
+      </tbody>
+    </table>
+  </div>
+      `;
+      // document.forms[0].username.value = name
+      // document.forms[0].email.value = email
     };
+
+    setTimeout(() => {
+      _getTxArr();
+    }, 1000);
   </script>
-  <script src="../scripts/timeLock.js"></script>
   <script src="../scripts/common.js"></script>
+  <script src="../scripts/timeLock.js"></script>
 
   <script src="../scripts/config.js"></script>
   <script src="../scripts/navbar.js"></script>
-  <script src="../scripts/automation.js"></script>
-
 </html>
