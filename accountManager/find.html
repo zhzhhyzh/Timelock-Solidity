@@ -15,7 +15,7 @@
   <body>
     <div class="body-pd">
       <div class="l-navbar" id="navbar">
-        <nav class="nav">
+       <nav class="nav">
           <div>
             <div class="nav__brand">
               <ion-icon
@@ -23,24 +23,12 @@
                 class="nav__toggle"
                 id="nav-toggle"
               ></ion-icon>
-              <a href="#" class="nav__logo">Bedimcode</a>
+              <a href="#" class="nav__logo">Timelock</a>
             </div>
-            <div class="nav__list">
-              <a href="#" class="nav__link active">
-                <ion-icon name="home-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Dashboard</span>
-              </a>
-              <a href="#" class="nav__link">
-                <ion-icon
-                  name="chatbubbles-outline"
-                  class="nav__icon"
-                ></ion-icon>
-                <span class="nav__name">Messenger</span>
-              </a>
-
-              <div class="nav__link collapse">
-                <ion-icon name="folder-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Projects</span>
+          
+            <div class="nav__link collapse active">
+              <ion-icon name="key-outline" class="nav__icon"></ion-icon>
+                <span class="nav__name">Accounts</span>
 
                 <ion-icon
                   name="chevron-down-outline"
@@ -48,19 +36,16 @@
                 ></ion-icon>
 
                 <ul class="collapse__menu">
-                  <a href="#" class="collapse__sublink">Data</a>
-                  <a href="#" class="collapse__sublink">Group</a>
-                  <a href="#" class="collapse__sublink">Members</a>
+                  <a href="../accountManager/create.html" class="collapse__sublink">Create</a>
+                  <a href="../accountManager/find.html" class="collapse__sublink">Search</a>
+                  <a href="../accountManager/list.html" class="collapse__sublink">List</a>
+                  <a href="../accountManager/purge.html" class="collapse__sublink">Purge</a>
                 </ul>
               </div>
-
-              <a href="#" class="nav__link">
-                <ion-icon name="pie-chart-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Analytics</span>
-              </a>
               <div class="nav__link collapse">
-                <ion-icon name="people-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Team</span>
+                <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
+
+                <span class="nav__name">Deposit</span>
 
                 <ion-icon
                   name="chevron-down-outline"
@@ -68,22 +53,66 @@
                 ></ion-icon>
 
                 <ul class="collapse__menu">
-                  <a href="#" class="collapse__sublink">Data</a>
-                  <a href="#" class="collapse__sublink">Group</a>
-                  <a href="#" class="collapse__sublink">Members</a>
+                  <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
+                  <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
+                  <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
+                  <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
+                
                 </ul>
               </div>
-              <a href="#" class="nav__link">
-                <ion-icon name="settings-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Settings</span>
-              </a>
+              <div class="nav__link collapse">
+                <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+                <span class="nav__name">Timelock</span>
+
+                <ion-icon
+                  name="chevron-down-outline"
+                  class="collapse__link"
+                ></ion-icon>
+
+                <ul class="collapse__menu">
+                  <a href="../timelock/list.html" class="collapse__sublink">List</a>
+                  <a href="../timelock/queue.html" class="collapse__sublink">Queue</a>
+                  <a href="../timelock/execute.html" class="collapse__sublink">Execute</a>
+                  <a href="../timelock/cancel.html" class="collapse__sublink">Cancel</a>
+                
+                </ul>
+              </div>
+              <div class="nav__link collapse">
+                <ion-icon name="person-outline" class="nav__icon"></ion-icon>
+                <span class="nav__name">Admin Configuration</span>
+
+                <ion-icon
+                  name="chevron-down-outline"
+                  class="collapse__link"
+                ></ion-icon>
+
+                <ul class="collapse__menu">
+                  <a href="../voteAdmin/currentAdmin.html" class="collapse__sublink">Current Admin</a>
+                  <a href="../voteAdmin/propose.html" class="collapse__sublink">Propose New Admin</a>
+                  <a href="../voteAdmin/vote.html" class="collapse__sublink">Voting</a>                
+                </ul>
+              </div>
+              <div class="nav__link collapse">
+                <ion-icon name="stopwatch-outline" class="nav__icon"></ion-icon>
+                <span class="nav__name">GP Configuration</span>
+
+                <ion-icon
+                  name="chevron-down-outline"
+                  class="collapse__link"
+                ></ion-icon>
+
+                <ul class="collapse__menu">
+                  <a href="../voteGP/currentGP.html" class="collapse__sublink">Current Grace Period</a>
+                  <a href="../voteGP/propose.html" class="collapse__sublink">Propose New Grace Period</a>
+                  <a href="../voteGP/currentAdmin.html" class="collapse__sublink">Voting</a>                
+                </ul>
+              </div>
+
+            
             </div>
           </div>
 
-          <a href="#" class="nav__link">
-            <ion-icon name="log-out-outline" class="nav__icon"></ion-icon>
-            <span class="nav__name">Log Out</span>
-          </a>
+    
         </nav>
       </div>
     </div>
