@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Vote Grace Period</title>
+    <title>Deposit</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -90,19 +90,28 @@
 
     <form onsubmit="return false">
       <div class="container">
-        <h1>Prosose Grace Period</h1>
-        <p>Propose a new grace period in seconds.</p>
+        <h1>Find Account Balance</h1>
+        <p>Please fill in the account address to find the account balance.</p>
 
+        <label for="address"><b>Account Address</b></label>
         <input
-          type="number"
-          name="gracePeriod"
-          placeholder="Enter Proposed Grace Period"
+          type="text"
+          name="address"
+          placeholder="Enter Account Address"
           required
-        />        <label for="gracePeriod"><b>seconds</b></label>
-
-       
+        />
+        <label for="value"><b>Balance</b></label><br>
+        <input
+        disabled
+          type="number"
+          name="value"
+          placeholder=" "
+          style="width:90%"
+          required
+        />
+        <b>ETH</b>
         <div class="clearfix">
-          <button onclick="_proposeGracePeriod()" class="btn">Propose</button>
+          <button onclick="_getAccountDeposit()" class="btn">Search</button>
         </div>
       </div>
     </form>
@@ -128,14 +137,14 @@
     </div>
   </body>
   <script>
-    let _proposeGracePeriod = async () => {
-      let gracePeriod = document.forms[0].gracePeriod.value;
-     
-      await proposeGracePeriod(gracePeriod);
+    let _getAccountDeposit = async() => {
+      let address = document.forms[0].address.value;
+      let value = await getAccountDeposit(address);
+      document.forms[0].value.value = value
     };
   </script>
-  <script src="../scripts/gracePeriodVoting.js"></script>
   <script src="../scripts/common.js"></script>
+  <script src="../scripts/deposit.js"></script>
 
   <script src="../scripts/config.js"></script>
   <script src="../scripts/navbar.js"></script>

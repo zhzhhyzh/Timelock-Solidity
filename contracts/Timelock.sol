@@ -236,7 +236,7 @@ contract Timelock {
         _;
     }
 
-    function startVoting(uint256 _proposedGracePeriod) public onlyAdmin {
+    function startVoting(uint256 _proposedGracePeriod) public {
         require(
             (_proposedGracePeriod >= minGracePeriod &&
                 _proposedGracePeriod <= maxGracePeriod),
@@ -321,7 +321,7 @@ contract Timelock {
     function resetVoting() internal {
         proposedGracePeriod = 0;
         votingActive = false;
-
+    votingEndTime = 0;
         voted = new address[](0);
     }
 

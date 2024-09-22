@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Queue Execution</title>
+  <title>Transaction</title>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
 
   <link rel="stylesheet" href="../styles/main.css" />
@@ -80,31 +80,39 @@
       <p>Please fill in this form to queue transaction.</p>
 
       <label for="address"><b>Target Address</b></label>
-      <input type="text" name="address" placeholder="Enter Transaction Id" required />
+      <input type="text" name="address" placeholder="Enter Target Address" required />
       <label for="_value"><b>Transaction Amount</b></label>
-      <input type="text" readonly name="_value" placeholder="Enter Transaction Amount" required />
-      <label for="_data"><b>Data</b></label>
-      <input type="text" readonly name="_data" placeholder="Enter Data" required />
-      <label for="_func"><b>Function</b></label>
-      <input type="text" readonly name="_func" placeholder="Enter Function" required />
-      <label for="timeStamp"><b>timeStamp</b></label>
-      <input type="text" readonly placeholder="Enter timeStamp" name="timeStamp" required />
-
-
+      <input type="text"  name="_value" placeholder="Enter Transaction Amount" required />
+      <label for="_value"><b>Automated execution?</b></label><br>
+        <input type="checkbox"  name="automation" value="true"  /><br>
+        <label for="txId"><b>Generated Transaction Id</b></label>
+        <input type="text" readonly  name="txId" placeholder=" "  />
+     
+     
       <div class="clearfix">
         <button onclick="_queuefunction()" class="btn">Queue</button>
       </div>
     </div>
   </form>
-  <div class="avatars">
-    <p id="address"></p>
-    <a href="#" onclick="switchAccount(0)" class="avatars__item"><img class="avatar"
-        src="https://randomuser.me/api/portraits/women/65.jpg" alt=""></a>
-    <a href="#" onclick="switchAccount(1)" class="avatars__item"><img class="avatar"
-        src="https://randomuser.me/api/portraits/men/25.jpg" alt=""></a>
-    <a href="#" onclick="switchAccount(2)" class="avatars__item"><img class="avatar"
-        src="https://randomuser.me/api/portraits/women/25.jpg" alt=""></a>
-
+  <div class="avatars" id="accounts">
+    <!-- <a href="#" onclick="switchAccount(0)" class="avatars__item"
+      ><img
+        class="avatar"
+        src="https://randomuser.me/api/portraits/women/65.jpg"
+        alt=""
+    /></a>
+    <a href="#" onclick="switchAccount(1)" class="avatars__item"
+      ><img
+        class="avatar"
+        src="https://randomuser.me/api/portraits/men/25.jpg"
+        alt=""
+    /></a>
+    <a href="#" onclick="switchAccount(2)" class="avatars__item"
+      ><img
+        class="avatar"
+        src="https://randomuser.me/api/portraits/women/25.jpg"
+        alt=""
+    /></a> -->
   </div>
 </body>
 <script>
@@ -112,13 +120,14 @@
 
     let address = document.forms[0].address.value;
     let _value = document.forms[0]._value.value;
-    let _func = document.forms[0]._func.value;
-    let _data = document.forms[0]._data.value;
-    let _timestamp = document.forms[0]._timestamp.value;
-    await queue(address, _value, _func, _data, _timestamp);
+  
+    await queue(address, _value);
+
+
   };
 </script>
 <script src="../scripts/timeLock.js"></script>
+<script src="../scripts/common.js"></script>
 
 <script src="../scripts/config.js"></script>
 <script src="../scripts/navbar.js"></script>

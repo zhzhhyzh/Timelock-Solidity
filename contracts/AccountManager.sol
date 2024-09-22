@@ -161,13 +161,31 @@ contract AccountManager {
         return address(this).balance;
     }
 
-    function getAccountDeposit(
+    function adminGetAccountDeposit(
         address _target
-    ) public view returns (uint256 value) {
+    ) public  view  onlyAdmin returns (uint256 value) {
         require(accounts[_target].exist, "Account doesn't exist");
         Account memory account = accounts[_target];
         return account.value;
     }
+
+    // for proccesing use onlt
+
+     function getAccountDeposit(
+        address _target
+    ) external  view  returns (uint256 value) {
+        require(accounts[_target].exist, "Account doesn't exist");
+        Account memory account = accounts[_target];
+        return account.value;
+    }
+    function getMyDeposit(
+    ) public view returns (uint256 value) {
+        require(accounts[msg.sender].exist, "Account doesn't exist");
+        Account memory account = accounts[msg.sender];
+        return account.value;
+    }
+
+    
 
     //Vote Admin---------------------------------------------------
     struct proposedAdmin {

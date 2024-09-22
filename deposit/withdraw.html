@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Vote Grace Period</title>
+    <title>Deposit</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -90,19 +90,20 @@
 
     <form onsubmit="return false">
       <div class="container">
-        <h1>Prosose Grace Period</h1>
-        <p>Propose a new grace period in seconds.</p>
+        <h1>Make Withdrawal</h1>
+        <p>Please fill in this form to make a withdrawal.</p>
 
+        <label for="value"><b>Value</b></label><br>
         <input
           type="number"
-          name="gracePeriod"
-          placeholder="Enter Proposed Grace Period"
+          name="value"
+          placeholder="0"
+          style="width:90%"
           required
-        />        <label for="gracePeriod"><b>seconds</b></label>
-
-       
+        />
+        <b>ETH</b>
         <div class="clearfix">
-          <button onclick="_proposeGracePeriod()" class="btn">Propose</button>
+          <button onclick="_withdrawalFunc()" class="btn">Make Withdrawal</button>
         </div>
       </div>
     </form>
@@ -128,14 +129,13 @@
     </div>
   </body>
   <script>
-    let _proposeGracePeriod = async () => {
-      let gracePeriod = document.forms[0].gracePeriod.value;
-     
-      await proposeGracePeriod(gracePeriod);
+    let _withdrawalFunc = async () => {
+      let value = document.forms[0].value.value;
+      await withdraw(value);
     };
   </script>
-  <script src="../scripts/gracePeriodVoting.js"></script>
   <script src="../scripts/common.js"></script>
+  <script src="../scripts/deposit.js"></script>
 
   <script src="../scripts/config.js"></script>
   <script src="../scripts/navbar.js"></script>

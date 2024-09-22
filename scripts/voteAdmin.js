@@ -5,12 +5,12 @@ const proposeAdmin = async (address) => {
       .call({ from: account })
       .then(async () => {
         const data = await accountManagerContract.methods
-          .startVoting(address)
+          .proposeAdmin(address)
           .send({ from: account });
         alert("Successful");
       });
   } catch (err) {
-
+    console.log(err)
     alert(generateErrorMessage(err));
     // // Decode the revert reason (skipping the first 4 bytes)
   }

@@ -5,15 +5,31 @@ let account;
 let timelockContract;
 let accountManagerContract;
 let voteAdminContract;
+let totalAccounts = 0;
 
 const accessToMetamask = async () => {
   if (window.ethereum !== "undefined") {
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-    account = accounts[1];
-    document.getElementById("address").innerText = account
-    // document.getElementById("accountArea").innerHTML = account;
+    totalAccounts = accounts.length;
+    account = accounts[0];
+    document.getElementById("accounts").innerHTML = `
+    <p id="address"></p>
+    ${
+      accounts.map((account,i)=>
+      `
+         <a href="#" onclick="switchAccount(${i})" class="avatars__item"
+        ><img
+          class="avatar"
+          src="https://randomuser.me/api/portraits/men/${i}.jpg"
+          alt=""
+      /></a>  
+      `)
+    }
+    `
+ 
+    document.getElementById("address").innerHTML = account;
   }
 };
 
@@ -28,9 +44,8 @@ const accessToContract = async () => {
   const timelockABI = data.abi;
   const accountManagerABI = data2.abi;
   // const voteAdminABI = data3.abi;
-  const timelockAddress = "0x4e0264af0621eAeFbb23d9A677C4B23a2b034ba4";
-  const accountManagerAddress =
-    "0xF5F37Cf5dcced9b4B651B72AE9fA996318d3366f";
+  const timelockAddress = data.networks["5777"].address;
+  const accountManagerAddress = data2.networks["5777"].address;
 
   // const voteAdminAddress =
   //   "0x5e3f514a35B57313E9650936fA096CB64303F2F5";
@@ -52,12 +67,14 @@ const accessToContract = async () => {
   //   AccountManagerABI,
   //   accountManagerAddress
   // ); //how you create an instance of that contract by using the abi and address
-  console.log(
-    "connected to smart contract")
+  console.log("connected to smart contract");
+  const admin = await accountManagerContract.methods
+  .getAdmin()
+  .call({ from: account });
 
+  document.getElementById("address").innerText = account +( account.toLowerCase()==admin.toLowerCase()?" (Admin)":"");
 
 };
-
 
 const switchAccount = async (index) => {
   if (window.ethereum !== "undefined") {
@@ -65,11 +82,17 @@ const switchAccount = async (index) => {
       method: "eth_requestAccounts",
     });
     account = accounts[index];
-    console.log("Account Switched")
-    document.getElementById("address").innerText = account
+    console.log("Account Switched");
+    const admin = await accountManagerContract.methods
+    .getAdmin()
+    .call({ from: account });
+
+    console.log(admin)
+
+    document.getElementById("address").innerText = account +( account.toLowerCase()==admin.toLowerCase()?" (Admin)":"");
     // document.getElementById("accountArea").innerHTML = account;
   }
-}
+};
 
-accessToMetamask()
-accessToContract()
+accessToMetamask();
+accessToContract();
