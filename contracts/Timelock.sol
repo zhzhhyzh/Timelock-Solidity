@@ -251,7 +251,7 @@ contract Timelock {
         _;
     }
 
-    function startVoting(uint256 _proposedGracePeriod) public {
+    function startVoting(uint256 _proposedGracePeriod) public onlyAdmin {
         require(
             (_proposedGracePeriod >= minGracePeriod &&
                 _proposedGracePeriod <= maxGracePeriod),
@@ -312,7 +312,7 @@ contract Timelock {
     }
 
     // FINALIZE the voting process after 2 minutes
-    function finalizeVote() public afterVotingPhase {
+    function finalizeVote() public afterVotingPhase onlyAdmin {
         require(proposedGracePeriod != 0, "No proposed grace period.");
         if (getTotalVotes() >= voteThreshold) {
             finalizeGPByThresHold(proposedGracePeriod);
