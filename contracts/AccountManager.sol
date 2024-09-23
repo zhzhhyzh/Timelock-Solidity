@@ -329,7 +329,7 @@ contract AccountManager {
         resetVoting();
     }
 
-    function finalizeAdmin() public afterVotingPhase checkAdminProposed {
+   function finalizeAdmin() public afterVotingPhase checkAdminProposed {
         address mostVotedAdmin;
         uint256 highestVotes = 0;
 
@@ -344,15 +344,16 @@ contract AccountManager {
             }
         }
 
-        require(mostVotedAdmin != address(0), "No valid admin found.");
-
-        // Set the new admin
+       if(mostVotedAdmin != address(0)){
+ // Set the new admin
         admin = mostVotedAdmin;
+                emit AdminChanged(mostVotedAdmin); // Emit an event for admin change
 
-        emit AdminChanged(mostVotedAdmin); // Emit an event for admin change
+       }
 
-        resetVoting();
-    }
+       
+    resetVoting();
+   }
 
     function resetVoting() internal {
         for (uint256 i = 0; i < voted.length; i++) {
