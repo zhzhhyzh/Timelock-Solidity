@@ -3,15 +3,11 @@ pragma solidity ^0.8.0;
 import "./AccountManager.sol";
 
 contract Timelock {
+    AccountManager public accountsContract;
 
-        AccountManager public accountsContract;
-
-    constructor(
-        address _accountsContractAddress
-    ) {
+    constructor(address _accountsContractAddress) {
         // admin = msg.sender;
         accountsContract = AccountManager(_accountsContractAddress);
-     
     }
 
     //Transaction--------------------------------------------------------------
@@ -41,12 +37,12 @@ contract Timelock {
     event Cancel(bytes32 indexed txId);
     event Deposited(address indexed user, uint256 amount);
 
-enum TxStatus{
-    Queued, 
-    Completed,
-    Cancelled,
-    Failed
-}
+    enum TxStatus {
+        Queued,
+        Completed,
+        Cancelled,
+        Failed
+    }
     // Struct to store transaction details
     struct Tx {
         bytes32 txId;
@@ -60,8 +56,8 @@ enum TxStatus{
 
     // Mapping of transaction IDs to transaction data
     mapping(bytes32 => Tx) private txs;
-    mapping(uint => bytes32) private indexToTxMapping;
-    uint txCount;
+    mapping(uint256 => bytes32) private indexToTxMapping;
+    uint256 txCount;
     address public whoDeposited;
     uint256 public depositAmt;
     uint256 public accountBalance;
@@ -73,22 +69,40 @@ enum TxStatus{
         uint256 _startTimestamp,
         uint256 _endTimestamp
     ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_sender,_target, _value,_startTimestamp,_endTimestamp));
+        return
+            keccak256(
+                abi.encode(
+                    _sender,
+                    _target,
+                    _value,
+                    _startTimestamp,
+                    _endTimestamp
+                )
+            );
     }
 
     function queue(
         address _target,
         uint256 _value,
-               uint256 _endTimestamp
-        ) external returns (bytes32) {
+        uint256 _endTimestamp
+    ) external returns (bytes32) {
         require(_value > 0, "Ether value must be greater than 0.");
-        require(_endTimestamp > block.timestamp, "End date and time must be in future.");
+        require(
+            _endTimestamp > block.timestamp,
+            "End date and time must be in future."
+        );
         require(
             accountsContract.getAccountDeposit(msg.sender) > _value,
             "Insufficient Balance"
         );
         // Generate the transaction ID based on the target and value
-        bytes32 txId = getTxId(msg.sender,_target, _value, block.timestamp, _endTimestamp);
+        bytes32 txId = getTxId(
+            msg.sender,
+            _target,
+            _value,
+            block.timestamp,
+            _endTimestamp
+        );
 
         // Ensure the transaction is not already queued
         // if (txs[txId].status==TxStatus.Queued) {
@@ -111,7 +125,14 @@ enum TxStatus{
         uint256 newAmount = accountsContract.getAccountDeposit(msg.sender) -
             _value;
         // Emit the Queue event
-        emit Queue(txId,msg.sender, _target, _value, block.timestamp,             _endTimestamp);
+        emit Queue(
+            txId,
+            msg.sender,
+            _target,
+            _value,
+            block.timestamp,
+            _endTimestamp
+        );
         addLog(currentTx);
         accountsContract.depositUpdate(msg.sender, newAmount);
         txCount++;
@@ -120,7 +141,7 @@ enum TxStatus{
 
     function getTxArr() public view returns (Tx[] memory) {
         Tx[] memory arr = new Tx[](txCount);
-        for (uint i = 0; i < txCount; i++) {
+        for (uint256 i = 0; i < txCount; i++) {
             if (txs[indexToTxMapping[i]].status == TxStatus.Queued) {
                 arr[i] = txs[indexToTxMapping[i]];
             }
@@ -128,11 +149,9 @@ enum TxStatus{
         return arr;
     }
 
-    function execute(
-        bytes32 _txId
-    ) external  {
+    function execute(bytes32 _txId) external {
         // Ensure the transaction is actually queued
-        if (txs[_txId].status!=TxStatus.Queued) {
+        if (txs[_txId].status != TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
 
@@ -147,14 +166,13 @@ enum TxStatus{
         // }
 
         // Ensure the transaction is executed after the grace period
-        if (block.timestamp < currentTx.endTimestamp ) {
+        if (block.timestamp < currentTx.endTimestamp) {
             revert TimestampNotMatureError(
                 block.timestamp,
                 currentTx.endTimestamp
             );
         }
 
-      
         uint256 newAmount = accountsContract.getAccountDeposit(
             currentTx.target
         ) + currentTx.value;
@@ -164,25 +182,34 @@ enum TxStatus{
         );
         if (!success) {
             txs[_txId].status = TxStatus.Failed;
-            updateStatus(_txId,TxStatus.Failed);
+            updateStatus(_txId, TxStatus.Failed);
             revert TxFailedError();
         }
         // Mark the transaction as executed
         txs[_txId].status = TxStatus.Completed;
 
         // Emit the Execute event
+         (bool c, string memory message) = updateStatus(
+            _txId,
+            TxStatus.Completed
+        );
+        require(c, message);
+
         emit Execute(
-           _txId,msg.sender, currentTx.target, currentTx.value, block.timestamp,             currentTx.endTimestamp
+            _txId,
+            msg.sender,
+            currentTx.target,
+            currentTx.value,
+            block.timestamp,
+            currentTx.endTimestamp
         );
 
         // return (currentTx.target, currentTx.value);
     }
 
-    function cancel(
-        bytes32 _txId
-    ) external{
+    function cancel(bytes32 _txId) external {
         // Ensure the transaction is queued
-        if (txs[_txId].status!=TxStatus.Queued) {
+        if (txs[_txId].status != TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
 
@@ -206,21 +233,28 @@ enum TxStatus{
             newAmount
         );
         // Emit the Cancel event
-        emit Cancel(_txId);
-                    updateStatus(_txId,TxStatus.Cancelled);
+        (bool c, string memory message) = updateStatus(
+            _txId,
+            TxStatus.Cancelled
+        );
+        require(c, message);
 
         require(success, "Failed to return Ether to depositor");
+        emit Cancel(_txId);
+
         // return (currentTx.depositor, currentTx.value);
     }
 
-    function getTx(
-        bytes32 _txId
-    ) external view returns (Tx memory transaction) {
+    function getTx(bytes32 _txId)
+        external
+        view
+        returns (Tx memory transaction)
+    {
         return txs[_txId];
     }
 
     // ------------------- LISTING BY YEOH ZHE HENG ------------------
-     struct Log {
+    struct Log {
         bytes32 txId;
         address sender;
         address target;
@@ -304,7 +338,7 @@ enum TxStatus{
         return filterLog;
     }
 
-     function listExecuted() public view returns (Log[] memory) {
+    function listExecuted() public view returns (Log[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < logs.length; i++) {
             if (
@@ -329,12 +363,13 @@ enum TxStatus{
 
         return filterLog;
     }
-     function listFailed() public view returns (Log[] memory) {
+
+    function listFailed() public view returns (Log[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < logs.length; i++) {
             if (
                 logs[i].sender == msg.sender &&
-                logs[i].currentState == TxStatus.Completed
+                logs[i].currentState == TxStatus.Failed
             ) {
                 count++;
             }
@@ -355,9 +390,7 @@ enum TxStatus{
         return filterLog;
     }
 
-    function addLog(
-       Tx memory _tx
-    ) internal returns (bool, string memory) {
+    function addLog(Tx memory _tx) internal returns (bool, string memory) {
         for (uint256 i = 0; i < logs.length; i++) {
             if (logs[i].txId == _tx.txId) {
                 return (false, "Transaction ID already exists");
@@ -379,25 +412,24 @@ enum TxStatus{
         return (true, "Log added successfully");
     }
 
- function updateStatus(bytes32 _txId, TxStatus _status)internal returns(bool, string memory){
+    function updateStatus(bytes32 _txId, TxStatus _status)
+        internal
+        returns (bool, string memory)
+    {
         bool found = false;
         uint256 count;
-        while(count < logs.length){
-            if(logs[count].txId == _txId){
+        while (count < logs.length) {
+            if (logs[count].txId == _txId) {
+                found = true;
                 break;
             }
             count++;
         }
-        if(!found){
+        if (!found) {
             return (false, "Transaction Id not found");
         }
 
         logs[count].currentState = _status;
         return (true, "Update log successfully");
-       
     }
-
-   
-
-
 }
