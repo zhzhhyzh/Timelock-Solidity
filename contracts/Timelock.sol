@@ -82,6 +82,7 @@ enum TxStatus{
                uint256 _endTimestamp
         ) external returns (bytes32) {
         require(_value > 0, "Ether value must be greater than 0.");
+        require(_endTimestamp > block.timestamp, "End date and time must be in future.");
         require(
             accountsContract.getAccountDeposit(msg.sender) > _value,
             "Insufficient Balance"
@@ -90,9 +91,9 @@ enum TxStatus{
         bytes32 txId = getTxId(msg.sender,_target, _value, block.timestamp, _endTimestamp);
 
         // Ensure the transaction is not already queued
-        if (txs[txId].status==TxStatus.Queued) {
-            revert AlreadyQueuedError(txId);
-        }
+        // if (txs[txId].status==TxStatus.Queued) {
+        //     revert AlreadyQueuedError(txId);
+        // }
 
         // Store the new transaction
         Tx memory currentTx = Tx(
@@ -117,15 +118,15 @@ enum TxStatus{
         return txId;
     }
 
-    // function getTxArr() public view returns (Tx[] memory) {
-    //     Tx[] memory arr = new Tx[](txCount);
-    //     for (uint i = 0; i < txCount; i++) {
-    //         if (txs[indexToTxMapping[i]].status == TxStatus.Queued) {
-    //             arr[i] = txs[indexToTxMapping[i]];
-    //         }
-    //     }
-    //     return arr;
-    // }
+    function getTxArr() public view returns (Tx[] memory) {
+        Tx[] memory arr = new Tx[](txCount);
+        for (uint i = 0; i < txCount; i++) {
+            if (txs[indexToTxMapping[i]].status == TxStatus.Queued) {
+                arr[i] = txs[indexToTxMapping[i]];
+            }
+        }
+        return arr;
+    }
 
     function execute(
         bytes32 _txId
@@ -320,6 +321,31 @@ enum TxStatus{
             if (
                 logs[i].sender == msg.sender &&
                 logs[i].currentState == TxStatus.Completed
+            ) {
+                filterLog[count] = logs[i];
+                count++;
+            }
+        }
+
+        return filterLog;
+    }
+     function listFailed() public view returns (Log[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Completed
+            ) {
+                count++;
+            }
+        }
+
+        Log[] memory filterLog = new Log[](count);
+        count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Failed
             ) {
                 filterLog[count] = logs[i];
                 count++;

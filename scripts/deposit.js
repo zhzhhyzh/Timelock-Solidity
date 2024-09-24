@@ -44,11 +44,11 @@ const getAccountDeposit = async (_user) => {
 const withdraw = async (value) => {
   try {
     const data = await accountManagerContract.methods
-      .withdraw(value)
+      .withdraw(String(value))
       .call({ from: account,  })
       .then(async () => {
         const data = await accountManagerContract.methods
-        .withdraw(value)
+        .withdraw(String(value))
         .send({ from: account,   });
         alert("Successful");
       });

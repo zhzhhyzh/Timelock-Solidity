@@ -103,23 +103,21 @@
       <p>Please fill in this form to queue transaction.</p>
 
       <label for="sender"><b>Sender Address</b></label>
-      <input type="text" name="sender" placeholder=" " readonly  />
+      <input type="text" name="sender"  placeholder=" " readonly  />
       <label for="address"><b>Target Address</b></label>
       <input type="text" name="address" placeholder="Enter Target Address" required />
-      <label for="_value"><b>Transaction Amount</b> <b> (Wei)</b></label>
+      <label for="_value"><b>Transaction Amount</b> <b> (ETH)</b></label>
       <input type="text" name="_value" placeholder="Enter Transaction Amount" required />
       <!-- <label for="_value"><b>Automated execution?</b></label><br>
         <input type="checkbox"  name="automation" value="true"  /><br> -->
+        <label for="address"><b>Execution Date & Time</b></label>
+
         <div class="datetimepicker">
-          <input type="date" id="date" name="endDate" value="2018-07-03">
+          <input type="date" id="date" name="endDate" required>
           <span></span>
-          <input type="time" id="time" name="endTime" value="08:00">
+          <input type="time" id="time" name="endTime" required>
         </div>
-        <div class="info">
-          <strong>Compatibility check:</strong>
-          Date "<span id="date-output"></span>",
-          Time "<span id="time-output"></span>"
-        </div>
+    
       <label for="txId"><b>Generated Transaction Id</b></label>
       <input type="text" readonly name="txId" placeholder=" " />
 
@@ -154,14 +152,18 @@
   let _queuefunction = async () => {
 
     let address = document.forms[0].address.value;
-    document.forms[0].sender.value = account;
     let _value = document.forms[0]._value.value;
     let endDate = document.forms[0].endDate.value;
     let endTime = document.forms[0].endTime.value;
-    await queue(address, _value, convertDateToUnix(endDate + " "+endTime));
+    await queue(address, _value*(10**18), convertDateToUnixTimestamp(endDate + " "+endTime));
 
 
   };
+
+  setTimeout(()=>{
+    document.forms[0].sender.value = account;
+
+  },1000)
 
   
 </script>
@@ -174,6 +176,5 @@
 <script src="../scripts/navbar.js"></script>
 <script src="../scripts/automation.js"></script>
 
-<script src="../scripts/automation.js" type="module"></script>
 
 </html>

@@ -1,16 +1,15 @@
 const queue = async (address, _value, date) => {
   try {
     const data = await timelockContract.methods
-      .queue(address, _valu, date)
+      .queue(address, String(_value), String(date))
       .call({ from: account })
       .then(async () => {
         const data = await timelockContract.methods
-          .queue(address, _value, date)
+          .queue(address,String( _value), String(date))
           .send({ from: account })
 
-          .then((txId)=>{
-            console.log(txId)
-            document.forms[0].txId.value = txId;
+          .then((res)=>{
+            document.forms[0].txId.value = res.events.Queue.returnValues[0];
             alert("Successful");
           })
       });

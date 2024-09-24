@@ -66,6 +66,7 @@ input[type="password"]:focus,
 input[type="number"]:focus,
 input[type="phone"]:focus,
 input[type="checkbox"]:focus,
+input[type="date"]:focus,
 
 select:focus {
   background-color: #ddd;
@@ -202,6 +203,7 @@ button:hover {
   /* margin:  50px 0 20px; */
   border-collapse: collapse;
   text-align: left;
+  word-break: break-all;
 }
 
 .table-wrapper table th,
@@ -233,47 +235,4 @@ input[type="checkbox"]{
   position:relative;
   left:7.5px;
   top:7.5px;
-}
-
-.datetimepicker {
-  display: inline-flex;
-  align-items: center;
-  background-color: #fff;
-  border: 4px solid darkturquoise;
-  border-radius: 8px;
-}
-.datetimepicker:focus-within {
-  border-color: teal;
-}
-.datetimepicker input {
-  font: inherit;
-  color: inherit;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  outline: none;
-  border: 0;
-  background-color: transparent;
-}
-.datetimepicker input[type=date] {
-  width: 10rem;
-  padding: 0.25rem 0 0.25rem 0.5rem;
-  border-right-width: 0;
-}
-.datetimepicker input[type=time] {
-  width: 5.5rem;
-  padding: 0.25rem 0.5rem 0.25rem 0;
-  border-left-width: 0;
-}
-.datetimepicker span {
-  height: 1rem;
-  margin-right: 0.25rem;
-  margin-left: 0.25rem;
-  border-right: 1px solid #ddd;
-}
-
-.info {
-  padding-top: 0.5rem;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
 }

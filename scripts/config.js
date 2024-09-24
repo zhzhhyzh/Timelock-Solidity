@@ -92,6 +92,7 @@ const switchAccount = async (index) => {
     console.log(admin)
 
     document.getElementById("address").innerText = account +( account.toLowerCase()==admin.toLowerCase()?" (Admin)":"");
+    if(document.forms[0]&&document.forms[0].sender)document.forms[0].sender.value = account;
     // document.getElementById("accountArea").innerHTML = account;
   }
 };

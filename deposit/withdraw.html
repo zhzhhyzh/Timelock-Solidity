@@ -104,7 +104,7 @@
 
       <label for="value"><b>Value</b></label><br>
       <input type="number" name="value" placeholder="0" style="width:90%" required />
-      <b>WEI</b>
+      <b>ETH</b>
       <div class="clearfix">
         <button onclick="_withdrawalFunc()" class="btn">Make Withdrawal</button>
       </div>
@@ -134,7 +134,7 @@
 <script>
   let _withdrawalFunc = async () => {
     let value = document.forms[0].value.value;
-    await withdraw(value);
+    await withdraw(value*(10**18));
   };
 </script>
 <script src="../scripts/common.js"></script>

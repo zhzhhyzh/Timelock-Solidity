@@ -1,12 +1,12 @@
-setInterval(async () => {
-  const data = await timelockContract.methods
-    .getTxArr()
-    .call({ from: account });
-  for (var i = 0; i < data.length; i++) {
-    if (data[i][4] && data[i][3] <= Date.now()) execute(data[i][0]);
-  }
-  console.log(data);
-}, 10000);
+// setInterval(async () => {
+//   const data = await timelockContract.methods
+//     .getTxArr()
+//     .call({ from: account });
+//     console.log(data)
+//   for (var i = 0; i < data.length; i++) {
+//     if (data[i][4] <= Date.now()) execute(data[i][0]);
+//   }
+// }, 10000);
 
 setInterval(async () => {
   // Increase time by 1 second
