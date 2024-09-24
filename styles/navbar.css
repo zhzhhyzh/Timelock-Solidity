@@ -136,6 +136,7 @@ a{
 .collapse__sublink{
   color: var(--sub-color);
   font-size: var(--small-font-size);
+  white-space: nowrap;
 }
 .collapse__sublink:hover{
   color: var(--white-color);
