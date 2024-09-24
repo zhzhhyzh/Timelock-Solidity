@@ -1,15 +1,18 @@
-const queue = async (address, _value) => {
+const queue = async (address, _value, date) => {
   try {
     const data = await timelockContract.methods
-      .queue(address, _value)
+      .queue(address, _valu, date)
       .call({ from: account })
       .then(async () => {
         const data = await timelockContract.methods
-          .queue(address, _value)
-          .send({ from: account });
-        alert("Successful");
-        let  _txId  = await getTxId(address, _value);
-        document.forms[0].txId.value = _txId;
+          .queue(address, _value, date)
+          .send({ from: account })
+
+          .then((txId)=>{
+            console.log(txId)
+            document.forms[0].txId.value = txId;
+            alert("Successful");
+          })
       });
   } catch (err) {
     console.log(err)

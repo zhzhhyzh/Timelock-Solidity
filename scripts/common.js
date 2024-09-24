@@ -9,3 +9,7 @@ const generateErrorMessage = (err) => {
     return decoded
   };
 
+const convertDateToUnixTimestamp = (date) =>{
+  Math.floor(new Date(date).getTime() / 1000)
+
+}

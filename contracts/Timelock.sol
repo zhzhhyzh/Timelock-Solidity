@@ -3,17 +3,15 @@ pragma solidity ^0.8.0;
 import "./AccountManager.sol";
 
 contract Timelock {
+
+        AccountManager public accountsContract;
+
     constructor(
-        address _accountsContractAddress,
-        uint256 _minGracePeriod,
-        uint256 _maxGracePeriod,
-        uint256 _defaultGracePeriod
+        address _accountsContractAddress
     ) {
         // admin = msg.sender;
         accountsContract = AccountManager(_accountsContractAddress);
-        minGracePeriod = _minGracePeriod;
-        maxGracePeriod = _maxGracePeriod;
-        gracePeriod = _defaultGracePeriod;
+     
     }
 
     //Transaction--------------------------------------------------------------
@@ -23,79 +21,88 @@ contract Timelock {
     error TimestampNotMatureError(uint256 blockTimestamp, uint256 expiresAt);
     error TimestampExpiredError(uint256 blockTimestamp, uint256 expiresAt);
     error TxFailedError();
-    error NotAdminError();
 
     event Queue(
         bytes32 indexed txId,
+        address indexed sender,
         address indexed target,
         uint256 value,
-        uint256 timestamp
+        uint256 startTimestamp,
+        uint256 endTimestamp
     );
     event Execute(
         bytes32 indexed txId,
+        address indexed sender,
         address indexed target,
         uint256 value,
-        uint256 timestamp
+        uint256 startTimestamp,
+        uint256 endTimestamp
     );
     event Cancel(bytes32 indexed txId);
     event Deposited(address indexed user, uint256 amount);
 
+enum TxStatus{
+    Queued, 
+    Completed,
+    Cancelled,
+    Failed
+}
     // Struct to store transaction details
     struct Tx {
         bytes32 txId;
+        address sender;
         address target;
         uint256 value;
-        uint256 timestamp;
-        bool queued;
-        address depositor;
+        uint256 startTimestamp;
+        uint256 endTimestamp;
+        TxStatus status;
     }
 
     // Mapping of transaction IDs to transaction data
     mapping(bytes32 => Tx) private txs;
     mapping(uint => bytes32) private indexToTxMapping;
     uint txCount;
-    address public admin;
-
-    uint256 private gracePeriod;
-
     address public whoDeposited;
     uint256 public depositAmt;
     uint256 public accountBalance;
 
-    function getGracePeriod() public view returns (uint256) {
-        return gracePeriod;
-    }
-
     function getTxId(
+        address _sender,
         address _target,
         uint256 _value,
-        uint256 _timestamp
+        uint256 _startTimestamp,
+        uint256 _endTimestamp
     ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_target, _value,_timestamp));
+        return keccak256(abi.encode(_sender,_target, _value,_startTimestamp,_endTimestamp));
     }
 
-    function queue(address _target, uint256 _value) external returns (bytes32) {
+    function queue(
+        address _target,
+        uint256 _value,
+               uint256 _endTimestamp
+        ) external returns (bytes32) {
         require(_value > 0, "Ether value must be greater than 0.");
         require(
             accountsContract.getAccountDeposit(msg.sender) > _value,
             "Insufficient Balance"
         );
         // Generate the transaction ID based on the target and value
-        bytes32 txId = getTxId(_target, _value, block.timestamp);
+        bytes32 txId = getTxId(msg.sender,_target, _value, block.timestamp, _endTimestamp);
 
         // Ensure the transaction is not already queued
-        if (txs[txId].queued) {
+        if (txs[txId].status==TxStatus.Queued) {
             revert AlreadyQueuedError(txId);
         }
 
         // Store the new transaction
         Tx memory currentTx = Tx(
             txId,
+            msg.sender,
             _target,
             _value,
             block.timestamp,
-            true,
-            msg.sender
+            _endTimestamp,
+            TxStatus.Queued
         );
         txs[txId] = currentTx;
         indexToTxMapping[txCount] = txId;
@@ -103,52 +110,50 @@ contract Timelock {
         uint256 newAmount = accountsContract.getAccountDeposit(msg.sender) -
             _value;
         // Emit the Queue event
-        emit Queue(txId, _target, _value, block.timestamp);
+        emit Queue(txId,msg.sender, _target, _value, block.timestamp,             _endTimestamp);
+        addLog(currentTx);
         accountsContract.depositUpdate(msg.sender, newAmount);
         txCount++;
         return txId;
     }
 
-    function getTxArr() public view returns (Tx[] memory) {
-        Tx[] memory arr = new Tx[](txCount);
-        for (uint i = 0; i < txCount; i++) {
-            if (txs[indexToTxMapping[i]].queued) {
-                arr[i] = txs[indexToTxMapping[i]];
-            }
-        }
-        return arr;
-    }
+    // function getTxArr() public view returns (Tx[] memory) {
+    //     Tx[] memory arr = new Tx[](txCount);
+    //     for (uint i = 0; i < txCount; i++) {
+    //         if (txs[indexToTxMapping[i]].status == TxStatus.Queued) {
+    //             arr[i] = txs[indexToTxMapping[i]];
+    //         }
+    //     }
+    //     return arr;
+    // }
 
     function execute(
         bytes32 _txId
-    ) external returns (address target, uint256 value) {
+    ) external  {
         // Ensure the transaction is actually queued
-        if (!txs[_txId].queued) {
+        if (txs[_txId].status!=TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
 
         Tx memory currentTx = txs[_txId];
 
-        // Ensure the timestamp has passed for execution
-        if (block.timestamp < currentTx.timestamp) {
-            revert TimestampNotPassedError(
-                block.timestamp,
-                currentTx.timestamp
-            );
-        }
+        // // Ensure the timestamp has passed for execution
+        // if (block.timestamp < currentTx.timestamp) {
+        //     revert TimestampNotPassedError(
+        //         block.timestamp,
+        //         currentTx.timestamp
+        //     );
+        // }
 
         // Ensure the transaction is executed after the grace period
-        if (block.timestamp < currentTx.timestamp + gracePeriod) {
+        if (block.timestamp < currentTx.endTimestamp ) {
             revert TimestampNotMatureError(
                 block.timestamp,
-                currentTx.timestamp + gracePeriod
+                currentTx.endTimestamp
             );
         }
 
-        // Mark the transaction as executed
-        txs[_txId].queued = false;
-        // Execute the transaction using the .call function
-
+      
         uint256 newAmount = accountsContract.getAccountDeposit(
             currentTx.target
         ) + currentTx.value;
@@ -157,51 +162,54 @@ contract Timelock {
             newAmount
         );
         if (!success) {
+            txs[_txId].status = TxStatus.Failed;
+            updateStatus(_txId,TxStatus.Failed);
             revert TxFailedError();
         }
+        // Mark the transaction as executed
+        txs[_txId].status = TxStatus.Completed;
 
         // Emit the Execute event
         emit Execute(
-            _txId,
-            currentTx.target,
-            currentTx.value,
-            currentTx.timestamp
+           _txId,msg.sender, currentTx.target, currentTx.value, block.timestamp,             currentTx.endTimestamp
         );
 
-        return (currentTx.target, currentTx.value);
+        // return (currentTx.target, currentTx.value);
     }
 
     function cancel(
         bytes32 _txId
-    ) external returns (address sender, uint256 value) {
+    ) external{
         // Ensure the transaction is queued
-        if (!txs[_txId].queued) {
+        if (txs[_txId].status!=TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
 
         Tx memory currentTx = txs[_txId];
-        // Ensure the transaction is executed in the grace period
-        if (block.timestamp >= currentTx.timestamp + gracePeriod) {
-            revert TimestampExpiredError(
-                block.timestamp,
-                currentTx.timestamp + gracePeriod
-            );
-        }
+        // // Ensure the transaction is executed in the grace period
+        // if (block.timestamp >= currentTx.timestamp + gracePeriod) {
+        //     revert TimestampExpiredError(
+        //         block.timestamp,
+        //         currentTx.timestamp + gracePeriod
+        //     );
+        // }
         // Mark the transaction as canceled
 
-        txs[_txId].queued = false;
+        txs[_txId].status = TxStatus.Cancelled;
 
         uint256 newAmount = accountsContract.getAccountDeposit(
-            currentTx.depositor
+            currentTx.sender
         ) + currentTx.value;
         bool success = accountsContract.depositUpdate(
-            currentTx.depositor,
+            currentTx.sender,
             newAmount
         );
         // Emit the Cancel event
         emit Cancel(_txId);
+                    updateStatus(_txId,TxStatus.Cancelled);
+
         require(success, "Failed to return Ether to depositor");
-        return (currentTx.depositor, currentTx.value);
+        // return (currentTx.depositor, currentTx.value);
     }
 
     function getTx(
@@ -210,142 +218,160 @@ contract Timelock {
         return txs[_txId];
     }
 
-    //Grace Period Voting-------------------------------------------------
-    AccountManager public accountsContract;
-    event NewGracePeriodProposed(uint256 newGracePeriod);
-    event GracePeriodChanged(uint256 gracePeriod);
-    event VotingFinalized(uint256 newGracePeriod);
-    address public owner;
-    uint256 public minGracePeriod;
-    uint256 public maxGracePeriod;
-
-    uint256 private votingStartTime;
-    uint256 private votingEndTime;
-    uint256 private proposalDeadline;
-    bool private votingActive;
-    uint256 private voteThreshold;
-    address[] public voted;
-    uint256 private proposedGracePeriod;
-    modifier onlyAdmin() {
-        require(
-            msg.sender == accountsContract.getAdmin(),
-            "Not Contract Admin"
-        );
-        _;
+    // ------------------- LISTING BY YEOH ZHE HENG ------------------
+     struct Log {
+        bytes32 txId;
+        address sender;
+        address target;
+        uint256 value;
+        uint256 startTimestamp; // Passed the scheduled for transaction date, in grace period form
+        uint256 endTimestamp; // Passed the scheduled for transaction date, in grace period form
+        TxStatus currentState;
     }
 
-    modifier duringVotingPhase() {
-        require(
-            block.timestamp >= votingStartTime &&
-                block.timestamp <= votingEndTime,
-            "Voting phase is not active."
-        );
-        _;
-    }
+    Log[] internal logs;
 
-    modifier afterVotingPhase() {
-        require(
-            block.timestamp > votingEndTime,
-            "Voting period has not ended."
-        );
-        _;
-    }
-
-    function startVoting(uint256 _proposedGracePeriod) public onlyAdmin {
-        require(
-            (_proposedGracePeriod >= minGracePeriod &&
-                _proposedGracePeriod <= maxGracePeriod),
-            "Proposed grace Period Out of range"
-        );
-        require(
-            _proposedGracePeriod != gracePeriod,
-            "Proposed grace period same with current grace period"
-        );
-        require(!votingActive, "Voting is already active.");
-        resetVoting();
-        votingStartTime = block.timestamp;
-        votingEndTime = block.timestamp + 120; // Total of 2 minutes
-
-        votingActive = true;
-
-        updateVoteThreshold();
-        proposedGracePeriod = _proposedGracePeriod;
-        emit NewGracePeriodProposed(proposedGracePeriod);
-    }
-
-    function updateVoteThreshold() internal {
-        uint256 totalRegisteredUsers = accountsContract.getAccountCount();
-        voteThreshold = (totalRegisteredUsers * 51 + 99) / 100; // Equivalent to rounding up (51% rule)
-    }
-
-    function voteGracePeriod() public duringVotingPhase {
-        require(proposedGracePeriod != 0, "No Grace Period proposed.");
-        require(
-            accountsContract.accountExists(msg.sender),
-            "Only registered users can vote."
-        );
-        require(!voterHasVoted(msg.sender), "Already voted.");
-
-        voted.push(msg.sender);
-
-        // Check if vote threshold has been met
-        if (getTotalVotes() >= voteThreshold) {
-            finalizeGPByThresHold(proposedGracePeriod);
-        }
-    }
-
-    function voterHasVoted(address _address) public view returns (bool) {
-        for (uint256 i = 0; i < voted.length; i++) {
-            if (voted[i] == _address) {
-                return true;
+    function listLogs() public view returns (Log[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (logs[i].sender == msg.sender) {
+                count++;
             }
         }
 
-        return false;
-    }
-
-    function finalizeGPByThresHold(uint256 _proposedGracePeriod) internal {
-        gracePeriod = _proposedGracePeriod;
-
-        emit VotingFinalized(_proposedGracePeriod);
-        resetVoting();
-    }
-
-    // FINALIZE the voting process after 2 minutes
-    function finalizeVote() public afterVotingPhase onlyAdmin {
-        require(proposedGracePeriod != 0, "No proposed grace period.");
-        if (getTotalVotes() >= voteThreshold) {
-            finalizeGPByThresHold(proposedGracePeriod);
-            emit GracePeriodChanged(proposedGracePeriod);
-            emit VotingFinalized(proposedGracePeriod);
-        } else {
-            // require(false, "Total Votes is not reached the threshold");
+        Log[] memory filterLog = new Log[](count);
+        count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (logs[i].sender == msg.sender) {
+                filterLog[count] = logs[i];
+                count++;
+            }
         }
 
-        resetVoting();
+        return filterLog;
     }
 
-    function getCurrentGracePeriod() public view returns (uint256) {
-        return gracePeriod;
-    }
-
-    function getProposedGracePeriod() public view returns (uint256) {
-        return proposedGracePeriod;
-    }
-
-    function resetVoting() internal {
-        proposedGracePeriod = 0;
-        votingActive = false;
-        votingEndTime = 0;
-        voted = new address[](0);
-    }
-
-    function getTotalVotes() internal view returns (uint256 totalVotes) {
-        totalVotes = 0;
-        for (uint256 i = 0; i < voted.length; i++) {
-            totalVotes += voted.length;
+    function listQueued() public view returns (Log[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Queued
+            ) {
+                count++;
+            }
         }
 
-        return totalVotes;
+        Log[] memory filterLog = new Log[](count);
+        count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Queued
+            ) {
+                filterLog[count] = logs[i];
+                count++;
+            }
+        }
+
+        return filterLog;
     }
+
+    function listCancelled() public view returns (Log[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Cancelled
+            ) {
+                count++;
+            }
+        }
+
+        Log[] memory filterLog = new Log[](count);
+        count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Cancelled
+            ) {
+                filterLog[count] = logs[i];
+                count++;
+            }
+        }
+
+        return filterLog;
+    }
+
+     function listExecuted() public view returns (Log[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Completed
+            ) {
+                count++;
+            }
+        }
+
+        Log[] memory filterLog = new Log[](count);
+        count = 0;
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (
+                logs[i].sender == msg.sender &&
+                logs[i].currentState == TxStatus.Completed
+            ) {
+                filterLog[count] = logs[i];
+                count++;
+            }
+        }
+
+        return filterLog;
+    }
+
+    function addLog(
+       Tx memory _tx
+    ) internal returns (bool, string memory) {
+        for (uint256 i = 0; i < logs.length; i++) {
+            if (logs[i].txId == _tx.txId) {
+                return (false, "Transaction ID already exists");
+            }
+        }
+
+        logs.push(
+            Log({
+                txId: _tx.txId,
+                sender: _tx.sender,
+                target: _tx.target,
+                value: _tx.value,
+                startTimestamp: _tx.startTimestamp,
+                endTimestamp: _tx.endTimestamp,
+                currentState: TxStatus.Queued
+            })
+        );
+
+        return (true, "Log added successfully");
+    }
+
+ function updateStatus(bytes32 _txId, TxStatus _status)internal returns(bool, string memory){
+        bool found = false;
+        uint256 count;
+        while(count < logs.length){
+            if(logs[count].txId == _txId){
+                break;
+            }
+            count++;
+        }
+        if(!found){
+            return (false, "Transaction Id not found");
+        }
+
+        logs[count].currentState = _status;
+        return (true, "Update log successfully");
+       
+    }
+
+   
+
+
 }
