@@ -113,9 +113,9 @@
 <script>
   let _listLogs = async () => {
     // let address = document.forms[0].address.value;
-    let data = await listLogs();
- let acc = (await listAccounts()).find((acc)=>acc[0]==obj[2])
-      let name = ""
+//     let data = await listLogs();
+//  let acc = (await listAccounts()).find((acc)=>acc[0]==obj[2])
+//       let name = ""
     document.getElementById("table").innerHTML = `
   <div class="table-wrapper">
     <table>
@@ -137,7 +137,7 @@
           async (obj) =>
             ` <tr>
           <td>${obj[0]}</td>
-          <td>${name}</td>
+          <td>${(await listAccounts()).find((acc)=>acc[0]==obj[2])? (await listAccounts()).find((acc)=>acc[0]==obj[2])[1]:"Deleted Acccount"}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
           <td style=' white-space:nowrap;' >${unixToDateTime(obj[4])}</td>
           <td style=' white-space:nowrap;' >${unixToDateTime(obj[5])}</td>
@@ -153,10 +153,13 @@
   </div>`;
 
     data.forEach((obj) => {
+
+
       const endTime = new Date(obj[5] * 1000); // Convert to milliseconds
       const timeoutElement = document.getElementById(`timeout-${obj[0]}`);
 
       const updateTime = () => {
+        if(obj[0]=="0"){
         const now = Date.now();
         const remainingTime = Math.max(endTime - now, 0); // Ensure non-negative time
 
@@ -174,6 +177,12 @@
           clearInterval(intervalId); // Stop timer when timeout is reached
           timeoutElement.textContent = 'Matured';
         }
+      
+      
+      }else{
+        timeoutElement.textContent = '---';
+
+      }
       };
 
       const intervalId = setInterval(updateTime, 1000); // Update time every second
