@@ -214,7 +214,7 @@ updateStatus(_txId, TxStatus.Completed);
             revert NotQueuedError(_txId);
         }
         require(txs[_txId].sender==msg.sender,"Only transaction sender can cancel.") ;
-.
+
         Tx memory currentTx = txs[_txId];
         // // Ensure the transaction is executed in the grace period
         // if (block.timestamp >= currentTx.timestamp + gracePeriod) {

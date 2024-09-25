@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Account</title>
+    <title>Transaction Log</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -26,7 +26,7 @@
               <a href="#" class="nav__logo">Timelock</a>
             </div>
 
-            <div class="nav__link collapse active">
+            <div class="nav__link collapse ">
               <ion-icon name="key-outline" class="nav__icon"></ion-icon>
               <span class="nav__name">Accounts</span>
 
@@ -52,7 +52,7 @@
                 >
               </ul>
             </div>
-            <div class="nav__link collapse">
+            <div class="nav__link collapse ">
               <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
 
               <span class="nav__name">Deposit</span>
@@ -98,7 +98,7 @@
                 >
               </ul>
             </div>
-            <div class="nav__link collapse">
+            <div class="nav__link collapse active">
               <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
               <span class="nav__name">Transaction Logs</span>
 
@@ -129,15 +129,16 @@
         </nav>
       </div>
     </div>
+
     <form onsubmit="return false">
       <div class="container" style="width:auto">
-        <h1>Accounts Listing</h1>
-        <p>List of accounts active.</p>
+        <h1>Transaction Log (Queued)</h1>
+        <p>List of queued transactions.</p>
 
         <div id="table"></div>
 
         <div class="clearfix">
-          <!-- <button onclick="_purgeAccount()" class="btn">Search</button> -->
+          <button onclick="_listLogs()" class="btn">Refresh</button>
         </div>
       </div>
     </form>
@@ -163,18 +164,21 @@
     </div>
   </body>
   <script>
-    let _listAccounts = async () => {
+    let _listLogs = async () => {
       // let address = document.forms[0].address.value;
-      let data = await listAccounts();
+      let data = await listQueued();
       document.getElementById("table").innerHTML = `
   <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th>Address</th>
-          <th>Name</th>
-          <th>Email</th>
+          <th>Transaction Id</th>
+          <th>Receiver</th>
           <th style='  text-align: right; '>Deposit Value (ETH)</th>
+           <th>Lock Timestamp</th>
+
+          <th>Execution Timestamp</th>
+
         </tr>
       </thead>
       <tbody>
@@ -182,9 +186,11 @@
         data.map((obj)=>
        ` <tr>
           <td>${obj[0]}</td>
-          <td>${obj[1]}</td>
           <td>${obj[2]}</td>
-          <td style='  text-align: right; '>${obj[4]/1000000000000000000}</td>
+            <td style='  text-align: right; '>${obj[3]/(10**18)}</td>
+          <td >${unixToDateTime(obj[4])}</td>
+          <td >${unixToDateTime(obj[5])}</td>
+
       
         </tr>`
         )
@@ -192,16 +198,17 @@
       </tbody>
     </table>
   </div>`;
-      // document.forms[0].username.value = name
+        // document.forms[0].username.value = name
       // document.forms[0].email.value = email
     };
 
     setTimeout(() => {
-      _listAccounts();
+      _listLogs();
     }, 1000);
   </script>
   <script src="../scripts/common.js"></script>
-  <script src="../scripts/accountManager.js"></script>
+  <script src="../scripts/logs.js"></script>
+  <script src="../scripts/timeLock.js"></script>
 
   <script src="../scripts/config.js"></script>
   <script src="../scripts/navbar.js"></script>  <script src="../scripts/automation.js"></script>

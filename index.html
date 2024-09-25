@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Vote Admin</title>
+    <title>Timelock</title>
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
@@ -15,7 +15,7 @@
   <body>
     <div class="body-pd">
       <div class="l-navbar" id="navbar">
-       <nav class="nav">
+        <nav class="nav">
           <div>
             <div class="nav__brand">
               <ion-icon
@@ -25,100 +25,112 @@
               ></ion-icon>
               <a href="#" class="nav__logo">Timelock</a>
             </div>
-          
-              <div class="nav__link collapse">  
-                <ion-icon name="key-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Accounts</span>
 
-                <ion-icon
-                  name="chevron-down-outline"
-                  class="collapse__link"
-                ></ion-icon>
+            <div class="nav__link collapse">
+              <ion-icon name="key-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Accounts</span>
 
-                <ul class="collapse__menu">
-                  <a href="../accountManager/create.html" class="collapse__sublink">Create</a>
-                  <a href="../accountManager/find.html" class="collapse__sublink">Search</a>
-                  <a href="../accountManager/list.html" class="collapse__sublink">List</a>
-                  <a href="../accountManager/purge.html" class="collapse__sublink">Purge</a>
-                </ul>
-              </div>
-              <div class="nav__link collapse">
-                <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
+              <ion-icon
+                name="chevron-down-outline"
+                class="collapse__link"
+              ></ion-icon>
 
-                <span class="nav__name">Deposit</span>
+              <ul class="collapse__menu">
+                <a
+                  href="../accountManager/create.html"
+                  class="collapse__sublink"
+                  >Create</a
+                >
+                <a href="../accountManager/find.html" class="collapse__sublink"
+                  >Search</a
+                >
+                <a href="../accountManager/list.html" class="collapse__sublink"
+                  >List</a
+                >
+                <a href="../accountManager/purge.html" class="collapse__sublink"
+                  >Purge</a
+                >
+              </ul>
+            </div>
+            <div class="nav__link collapse">
+              <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
 
-                <ion-icon
-                  name="chevron-down-outline"
-                  class="collapse__link"
-                ></ion-icon>
+              <span class="nav__name">Deposit</span>
 
-                <ul class="collapse__menu">
-                  <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
-                  <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
-                  <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
-                  <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
-                
-                </ul>
-              </div>
-              <div class="nav__link collapse">
-                <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Timelock</span>
+              <ion-icon
+                name="chevron-down-outline"
+                class="collapse__link"
+              ></ion-icon>
 
-                <ion-icon
-                  name="chevron-down-outline"
-                  class="collapse__link"
-                ></ion-icon>
+              <ul class="collapse__menu">
+                <a href="../deposit/create.html" class="collapse__sublink"
+                  >Deposit</a
+                >
+                <a href="../deposit/withdraw.html" class="collapse__sublink"
+                  >Withdrawal</a
+                >
+                <a href="../deposit/myDeposit.html" class="collapse__sublink"
+                  >Balance Enquiry</a
+                >
+                <a href="../deposit/find.html" class="collapse__sublink"
+                  >Other Acc Balances</a
+                >
+              </ul>
+            </div>
+            <div class="nav__link collapse active">
+              <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Timelock</span>
 
-                <ul class="collapse__menu">
-                  <a href="../timelock/list.html" class="collapse__sublink">List</a>
-                  <a href="../timelock/queue.html" class="collapse__sublink">Queue</a>
-                  <a href="../timelock/execute.html" class="collapse__sublink">Execute</a>
-                  <a href="../timelock/cancel.html" class="collapse__sublink">Cancel</a>
-                
-                </ul>
-              </div>
-              <div class="nav__link collapse`">
-                <ion-icon name="person-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">Admin Configuration</span>
+              <ion-icon
+                name="chevron-down-outline"
+                class="collapse__link"
+              ></ion-icon>
 
-                <ion-icon
-                  name="chevron-down-outline"
-                  class="collapse__link"
-                ></ion-icon>
+              <ul class="collapse__menu">
+                <a href="../timelock/queue.html" class="collapse__sublink"
+                  >Queue</a
+                >
+                <a href="../timelock/execute.html" class="collapse__sublink"
+                  >Execute</a
+                >
+                <a href="../timelock/cancel.html" class="collapse__sublink"
+                  >Cancel</a
+                >
+              </ul>
+            </div>
+            <div class="nav__link collapse">
+              <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+              <span class="nav__name">Transaction Logs</span>
 
-                <ul class="collapse__menu">
-                  <a href="../voteAdmin/currentAdmin.html" class="collapse__sublink">Current Admin</a>
-                  <a href="../voteAdmin/propose.html" class="collapse__sublink">Propose New Admin</a>
-                  <a href="../voteAdmin/vote.html" class="collapse__sublink">Voting</a>                
-                </ul>
-              </div>
-              <div class="nav__link collapse">
-                <ion-icon name="stopwatch-outline" class="nav__icon"></ion-icon>
-                <span class="nav__name">GP Configuration</span>
+              <ion-icon
+                name="chevron-down-outline"
+                class="collapse__link"
+              ></ion-icon>
 
-                <ion-icon
-                  name="chevron-down-outline"
-                  class="collapse__link"
-                ></ion-icon>
-
-                <ul class="collapse__menu">
-                  <a href="../voteGP/currentGP.html" class="collapse__sublink">Current Grace Period</a>
-                  <a href="../voteGP/propose.html" class="collapse__sublink">Propose New Grace Period</a>
-                  <a href="../voteGP/vote.html" class="collapse__sublink">Voting</a>                
-                </ul>
-              </div>
-
-            
+              <ul class="collapse__menu">
+                <a href="../txLogs/listLogs.html" class="collapse__sublink"
+                  >All</a
+                >
+                <a href="../txLogs/listQueued.html" class="collapse__sublink"
+                  >Queued</a
+                >
+                <a href="../txLogs/listExecuted.html" class="collapse__sublink"
+                  >Completed</a
+                >
+                <a href="../txLogs/listCancelled.html" class="collapse__sublink"
+                  >Cancelled</a
+                >
+                <a href="../txLogs/listFailed.html" class="collapse__sublink"
+                  >Failed</a
+                >
+              </ul>
             </div>
           </div>
-
-    
         </nav>
       </div>
     </div>
 
-
-  <div class="avatars" id="accounts">
+    <div class="avatars" id="accounts">
       <!-- <a href="#" onclick="switchAccount(0)" class="avatars__item"
         ><img
           class="avatar"
@@ -142,12 +154,12 @@
   <script>
     let _proposeAdmin = async () => {
       let gracePeriod = document.forms[0].gracePeriod.value;
-     
+
       await proposeAdmin(gracePeriod);
     };
     let _startVoting = async () => {
       // let gracePeriod = document.forms[0].gracePeriod.value;
-     
+
       await startVoting();
     };
   </script>
@@ -155,6 +167,6 @@
   <script src="../scripts/common.js"></script>
 
   <script src="../scripts/config.js"></script>
-  <script src="../scripts/navbar.js"></script>  <script src="../scripts/automation.js"></script>
-
+  <script src="../scripts/navbar.js"></script>
+  <script src="../scripts/automation.js"></script>
 </html>

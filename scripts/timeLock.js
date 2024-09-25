@@ -29,17 +29,17 @@ const queue = async (address, _value, date) => {
 //   console.log(data);
 // };
 
-const execute = async (_txid) => {
+const execute = async (_txid, _address) => {
   try {
     
     console.log(_txid)
     const data = await timelockContract.methods
       .execute(_txid)
-      .call({ from: account })
+      .call({ from: _address })
       .then(async () => {
         const data = await timelockContract.methods
           .execute(_txid)
-          .send({ from: account });
+          .send({ from: _address });
 
         alert("Successful");
       });
