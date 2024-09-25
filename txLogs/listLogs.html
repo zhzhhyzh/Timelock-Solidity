@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
   </head>
   <body>
-    <div class="body-pd">
+    <div class="body-pd" id="body-pd">
       <div class="l-navbar" id="navbar">
         <nav class="nav">
           <div>
@@ -182,11 +182,11 @@
         </tr>
       </thead>
       <tbody>
-        ${data.map(
-          (obj) =>
+        ${await Promise.all(data.map(
+          async (obj) =>
             ` <tr>
           <td>${obj[0]}</td>
-          <td>${obj[2]}</td>
+          <td>${(await listAccounts()).find((acc)=>acc[0]==obj[2])[1]}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
           <td >${unixToDateTime(obj[4])}</td>
           <td y>${unixToDateTime(obj[5])}</td>
@@ -194,7 +194,7 @@
           <td>${getStatus(obj[6])}</td>
       
         </tr>`
-        )}
+        ))}
       </tbody>
     </table>
   </div>`;
@@ -208,6 +208,7 @@
   </script>
   <script src="../scripts/common.js"></script>
   <script src="../scripts/logs.js"></script>
+  <script src="../scripts/accountManager.js"></script>
   <script src="../scripts/timeLock.js"></script>
 
   <script src="../scripts/config.js"></script>
