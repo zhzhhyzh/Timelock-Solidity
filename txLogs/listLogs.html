@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <div class="body-pd">
+  <div class="body-pd" id="body-pd">
     <div class="l-navbar" id="navbar">
       <nav class="nav">
         <div>
@@ -37,7 +37,7 @@
           <div class="nav__link collapse ">
             <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
 
-            <span class="nav__name">Deposit</span>
+              <span class="nav__name">Funds</span>
 
             <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
 
@@ -133,11 +133,11 @@
         </tr>
       </thead>
       <tbody>
-        ${data.map(
-      (obj) =>
-        ` <tr>
-          <td >${obj[0]}</td>
-          <td>${obj[2]}</td>
+        ${await Promise.all(data.map(
+          async (obj) =>
+            ` <tr>
+          <td>${obj[0]}</td>
+          <td>${(await listAccounts()).find((acc)=>acc[0]==obj[2])[1]}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
           <td style=' white-space:nowrap;' >${unixToDateTime(obj[4])}</td>
           <td style=' white-space:nowrap;' >${unixToDateTime(obj[5])}</td>
@@ -147,7 +147,7 @@
                   <span style=' white-space:nowrap;'  id="timeout-${obj[0]}"></span> </td>
       
         </tr>`
-    )}
+        ))}
       </tbody>
     </table>
   </div>`;
@@ -186,13 +186,14 @@
   // document.forms[0].email.value = email
 
 
-  setTimeout(() => {
-    _listLogs();
-  }, 1000);
-</script>
-<script src="../scripts/common.js"></script>
-<script src="../scripts/logs.js"></script>
-<script src="../scripts/timeLock.js"></script>
+    setTimeout(() => {
+      _listLogs();
+    }, 1000);
+  </script>
+  <script src="../scripts/common.js"></script>
+  <script src="../scripts/logs.js"></script>
+  <script src="../scripts/accountManager.js"></script>
+  <script src="../scripts/timeLock.js"></script>
 
 <script src="../scripts/config.js"></script>
 <script src="../scripts/navbar.js"></script>
