@@ -170,6 +170,7 @@ enum TxStatus{
         // Mark the transaction as executed
         txs[_txId].status = TxStatus.Completed;
 
+updateStatus(_txId, TxStatus.Completed);
         // Emit the Execute event
         emit Execute(
            _txId,msg.sender, currentTx.target, currentTx.value, block.timestamp,             currentTx.endTimestamp
@@ -185,7 +186,8 @@ enum TxStatus{
         if (txs[_txId].status!=TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
-
+        require(txs[_txId].sender==msg.sender,"Only transaction sender can cancel.") ;
+.
         Tx memory currentTx = txs[_txId];
         // // Ensure the transaction is executed in the grace period
         // if (block.timestamp >= currentTx.timestamp + gracePeriod) {
