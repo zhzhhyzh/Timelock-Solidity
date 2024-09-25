@@ -1,11 +1,11 @@
-const createAccount = async (address, name, email) => {
+const createAccount = async ( name, email) => {
   try {
     const data = await accountManagerContract.methods
-      .createAccount(address, name, email)
+      .createAccount( name, email)
       .call({ from: account })
       .then(async () => {
         const data = await accountManagerContract.methods
-          .createAccount(address, name, email)
+          .createAccount( name, email)
           .send({ from: account });
         alert("Successful");
       });
@@ -31,14 +31,14 @@ const getAccountDetails = async (address) => {
     // // Decode the revert reason (skipping the first 4 bytes)
   }
 };
-const purgeAccount = async (_user) => {
+const purgeAccount = async () => {
   try {
     const data = await accountManagerContract.methods
-      .purgeAccount(_user)
+      .purgeAccount()
       .call({ from: account })
       .then(async () => {
         const data = await accountManagerContract.methods
-          .purgeAccount(_user)
+          .purgeAccount()
           .send({ from: account });
         alert("Successful");
       });

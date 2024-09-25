@@ -45,7 +45,6 @@
               <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
               <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
               <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
-              <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
             </ul>
           </div>
           <div class="nav__link collapse">
@@ -121,7 +120,7 @@
     <table>
       <thead>
         <tr>
-          <th>Transaction Id</th>
+          <th style=' white-space:nowrap;'>Transaction Id</th>
           <th>Receiver</th>
           <th style='  text-align: right; '>Deposit Value (ETH)</th>
                     <th>Lock Timestamp</th>
@@ -172,7 +171,7 @@
 
         if (remainingTime === 0) {
           clearInterval(intervalId); // Stop timer when timeout is reached
-          timeoutElement.textContent = 'Expired';
+          timeoutElement.textContent = 'Matured';
         }
       };
 

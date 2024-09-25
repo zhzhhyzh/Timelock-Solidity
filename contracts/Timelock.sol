@@ -95,6 +95,7 @@ contract Timelock {
             accountsContract.getAccountDeposit(msg.sender) > _value,
             "Insufficient Balance"
         );
+        require(accountsContract.isExisted(_target), "Receiver Not Exist");
         // Generate the transaction ID based on the target and value
         bytes32 txId = getTxId(
             msg.sender,
@@ -188,9 +189,9 @@ contract Timelock {
         // Mark the transaction as executed
         txs[_txId].status = TxStatus.Completed;
 
-updateStatus(_txId, TxStatus.Completed);
+        updateStatus(_txId, TxStatus.Completed);
         // Emit the Execute event
-         (bool c, string memory message) = updateStatus(
+        (bool c, string memory message) = updateStatus(
             _txId,
             TxStatus.Completed
         );
@@ -213,7 +214,10 @@ updateStatus(_txId, TxStatus.Completed);
         if (txs[_txId].status != TxStatus.Queued) {
             revert NotQueuedError(_txId);
         }
-        require(txs[_txId].sender==msg.sender,"Only transaction sender can cancel.") ;
+        require(
+            txs[_txId].sender == msg.sender,
+            "Only transaction sender can cancel."
+        );
 
         Tx memory currentTx = txs[_txId];
         // // Ensure the transaction is executed in the grace period

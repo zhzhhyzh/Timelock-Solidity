@@ -72,9 +72,7 @@
                 <a href="../deposit/myDeposit.html" class="collapse__sublink"
                   >Balance Enquiry</a
                 >
-                <a href="../deposit/find.html" class="collapse__sublink"
-                  >Other Acc Balances</a
-                >
+                
               </ul>
             </div>
             <div class="nav__link collapse">
@@ -133,7 +131,7 @@
     <form onsubmit="return false">
       <div class="container">
         <h1>Purge Account</h1>
-        <p>Please fill in the account address to delete account.</p>
+        <!-- <p>Please fill in the account address to delete account.</p>
 
         <label for="address"><b>Account Address</b></label>
         <input
@@ -141,10 +139,10 @@
           name="address"
           placeholder="Enter Account Address"
           required
-        />
+        /> -->
 
         <div class="clearfix">
-          <button onclick="_purgeAccount()" class="btn">Search</button>
+          <button onclick="_purgeAccount()" class="btn" style="background-color: red;">PURGE</button>
         </div>
       </div>
     </form>
@@ -171,8 +169,8 @@
   </body>
   <script>
     let _purgeAccount = async () => {
-      let address = document.forms[0].address.value;
-      await purgeAccount(address);
+      // let address = document.forms[0].address.value;
+      await purgeAccount();
       // document.forms[0].username.value = name
       // document.forms[0].email.value = email
     };

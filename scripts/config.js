@@ -16,8 +16,7 @@ const accessToMetamask = async () => {
     account = accounts[0];
     document.getElementById("accounts").innerHTML = `
     <p id="address"></p>
-    ${
-      accounts.map((account,i)=>
+    ${accounts.map((account, i) =>
       `
          <a href="#" onclick="switchAccount(${i})" class="avatars__item"
         ><img
@@ -26,9 +25,9 @@ const accessToMetamask = async () => {
           alt=""
       /></a>  
       `)
-    }
+      }
     `
- 
+
     document.getElementById("address").innerHTML = account;
   }
 };
@@ -59,7 +58,7 @@ const accessToContract = async () => {
     accountManagerABI,
     accountManagerAddress
   );
-console.log(web3.currentProvider)
+  console.log(web3.currentProvider)
 
   // voteAdminContract = await new window.web3.eth.Contract(
   //   voteAdminABI,
@@ -71,10 +70,10 @@ console.log(web3.currentProvider)
   // ); //how you create an instance of that contract by using the abi and address
   console.log("connected to smart contract");
   const admin = await accountManagerContract.methods
-  .getAdmin()
-  .call({ from: account });
+    .getAdmin()
+    .call({ from: account });
 
-  document.getElementById("address").innerText = account +( account.toLowerCase()==admin.toLowerCase()?" (Admin)":"");
+  document.getElementById("address").innerText = account + (account.toLowerCase() == admin.toLowerCase() ? " (Admin)" : "");
 
 };
 
@@ -86,13 +85,13 @@ const switchAccount = async (index) => {
     account = accounts[index];
     console.log("Account Switched");
     const admin = await accountManagerContract.methods
-    .getAdmin()
-    .call({ from: account });
+      .getAdmin()
+      .call({ from: account });
 
     console.log(admin)
 
-    document.getElementById("address").innerText = account +( account.toLowerCase()==admin.toLowerCase()?" (Admin)":"");
-    if(document.forms[0]&&document.forms[0].sender)document.forms[0].sender.value = account;
+    document.getElementById("address").innerText = account + (account.toLowerCase() == admin.toLowerCase() ? " (Admin)" : "");
+    if (document.forms[0] && document.forms[0].sender) document.forms[0].sender.value = account;
     // document.getElementById("accountArea").innerHTML = account;
   }
 };

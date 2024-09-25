@@ -29,11 +29,12 @@ contract AccountManager {
     event DepositMade(address indexed user, uint256 amount);
     event WithdrawalMade(address indexed user, uint256 amount);
     event DepositUpdated(address indexed user, uint256 newAmount);
+
     // Modifiers
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "Not Contract Admin");
-        _;
-    }
+    // modifier onlyAdmin() {
+    //     require(msg.sender == admin, "Not Contract Admin");
+    //     _;
+    // }
 
     constructor() {
         admin = msg.sender;
@@ -65,34 +66,30 @@ contract AccountManager {
         return accounts[_account].exist;
     }
 
-    function createAccount(
-        address _user,
-        string memory _name,
-        string memory _email
-    ) public onlyAdmin  {
-        require(!accounts[_user].exist, "Account already exists");
+    function createAccount(string memory _name, string memory _email) public {
+        require(!accounts[msg.sender].exist, "Account already exists");
 
-        accounts[_user] = Account({
-            userAddress: _user,
+        accounts[msg.sender] = Account({
+            userAddress: msg.sender,
             name: _name,
             email: _email,
             exist: true,
             value: 0
         });
-        accountAddresses.push(_user); // Add the user's address to the array
+        accountAddresses.push(msg.sender); // Add the user's address to the array
         totalAccounts++;
 
-        emit AccountCreated(_user, _name, _email, 0);
+        emit AccountCreated(msg.sender, _name, _email, 0);
     }
 
-    function purgeAccount(address _user) public onlyAdmin {
-        require(accounts[_user].exist, "Account doesn't exist");
+    function purgeAccount() public {
+        require(accounts[msg.sender].exist, "Account doesn't exist");
 
         totalAccounts--;
-        delete accounts[_user];
+        delete accounts[msg.sender];
 
         for (uint256 i = 0; i < accountAddresses.length; i++) {
-            if (accountAddresses[i] == _user) {
+            if (accountAddresses[i] == msg.sender) {
                 accountAddresses[i] = accountAddresses[
                     accountAddresses.length - 1
                 ];
@@ -101,15 +98,17 @@ contract AccountManager {
             }
         }
 
-        emit AccountPurged(_user);
+        emit AccountPurged(msg.sender);
     }
 
-    function getAccountDetails(
-        address _user
-    )
+    function getAccountDetails(address _user)
         public
         view
-        returns (string memory name, string memory email, uint256 value)
+        returns (
+            string memory name,
+            string memory email,
+            uint256 value
+        )
     {
         require(accounts[_user].exist, "Account doesn't exist");
         Account memory account = accounts[_user];
@@ -143,10 +142,10 @@ contract AccountManager {
         emit WithdrawalMade(msg.sender, _amount);
     }
 
-    function depositUpdate(
-        address _user,
-        uint256 _newAmount
-    ) public returns (bool success) {
+    function depositUpdate(address _user, uint256 _newAmount)
+        public
+        returns (bool success)
+    {
         require(accounts[_user].exist, "Account doesn't exist");
 
         // Update the user's value to the new amount
@@ -161,31 +160,43 @@ contract AccountManager {
         return address(this).balance;
     }
 
-    function adminGetAccountDeposit(
-        address _target
-    ) public  view  onlyAdmin returns (uint256 value) {
+    function adminGetAccountDeposit(address _target)
+        public
+        view
+        returns (uint256 value)
+    {
         require(accounts[_target].exist, "Account doesn't exist");
         Account memory account = accounts[_target];
         return account.value;
+    }
+
+    function isExisted(address _target) public view returns(bool exist){
+        bool found = false;
+        for (uint256 i = 0; i < accountAddresses.length; i++){
+            if(_target == accountAddresses[i]){
+                found = true;
+                break;
+            }
+        }
+
+        return found;
     }
 
     // for proccesing use onlt
 
-     function getAccountDeposit(
-        address _target
-    ) external  view  returns (uint256 value) {
+    function getAccountDeposit(address _target)
+        external
+        view
+        returns (uint256 value)
+    {
         require(accounts[_target].exist, "Account doesn't exist");
         Account memory account = accounts[_target];
         return account.value;
     }
-    function getMyDeposit(
-    ) public view returns (uint256 value) {
+
+    function getMyDeposit() public view returns (uint256 value) {
         require(accounts[msg.sender].exist, "Account doesn't exist");
         Account memory account = accounts[msg.sender];
         return account.value;
     }
-
-    
-
-   
 }

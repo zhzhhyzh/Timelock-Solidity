@@ -72,9 +72,7 @@
                 <a href="../deposit/myDeposit.html" class="collapse__sublink"
                   >Balance Enquiry</a
                 >
-                <a href="../deposit/find.html" class="collapse__sublink"
-                  >Other Acc Balances</a
-                >
+                
               </ul>
             </div>
             <div class="nav__link collapse">
@@ -135,13 +133,13 @@
         <h1>Create Account</h1>
         <p>Please fill in this form to create an account.</p>
 
-        <label for="address"><b>Account Address</b></label>
+        <!-- <label for="address"><b>Account Address</b></label>
         <input
           type="text"
           name="address"
           placeholder="Enter Account Address"
           required
-        />
+        /> -->
         <label for="email"><b>Name</b></label>
         <input type="text" name="username" placeholder="Enter Name" required />
         <label for="email"><b>Email</b></label>
@@ -177,8 +175,8 @@
     let _createAccountfunction = async () => {
       let name = document.forms[0].username.value;
       let email = document.forms[0].email.value;
-      let address = document.forms[0].address.value;
-      await createAccount(address, name, email);
+      // let address = document.forms[0].address.value;
+      await createAccount( name, email);
     };
   </script>
   <script src="../scripts/common.js"></script>
