@@ -1,148 +1,97 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Transaction Log</title>
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"
-    ></script>
 
-    <link rel="stylesheet" href="../styles/main.css" />
-    <link rel="stylesheet" href="../styles/navbar.css" />
+<head>
+  <title>Transaction Log</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
 
-    <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
-  </head>
-  <body>
-    <div class="body-pd">
-      <div class="l-navbar" id="navbar">
-        <nav class="nav">
-          <div>
-            <div class="nav__brand">
-              <ion-icon
-                name="menu-outline"
-                class="nav__toggle"
-                id="nav-toggle"
-              ></ion-icon>
-              <a href="#" class="nav__logo">Timelock</a>
-            </div>
+  <link rel="stylesheet" href="../styles/main.css" />
+  <link rel="stylesheet" href="../styles/navbar.css" />
 
-            <div class="nav__link collapse ">
-              <ion-icon name="key-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Accounts</span>
+  <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
+</head>
 
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a
-                  href="../accountManager/create.html"
-                  class="collapse__sublink"
-                  >Create</a
-                >
-                <a href="../accountManager/find.html" class="collapse__sublink"
-                  >Search</a
-                >
-                <a href="../accountManager/list.html" class="collapse__sublink"
-                  >List</a
-                >
-                <a href="../accountManager/purge.html" class="collapse__sublink"
-                  >Purge</a
-                >
-              </ul>
-            </div>
-            <div class="nav__link collapse ">
-              <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
-
-              <span class="nav__name">Deposit</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../deposit/create.html" class="collapse__sublink"
-                  >Deposit</a
-                >
-                <a href="../deposit/withdraw.html" class="collapse__sublink"
-                  >Withdrawal</a
-                >
-                <a href="../deposit/myDeposit.html" class="collapse__sublink"
-                  >Balance Enquiry</a
-                >
-                <a href="../deposit/find.html" class="collapse__sublink"
-                  >Other Acc Balances</a
-                >
-              </ul>
-            </div>
-            <div class="nav__link collapse">
-              <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Timelock</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../timelock/queue.html" class="collapse__sublink"
-                  >Queue</a
-                >
-                <a href="../timelock/execute.html" class="collapse__sublink"
-                  >Execute</a
-                >
-                <a href="../timelock/cancel.html" class="collapse__sublink"
-                  >Cancel</a
-                >
-              </ul>
-            </div>
-            <div class="nav__link collapse active">
-              <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
-              <span class="nav__name">Transaction Logs</span>
-
-              <ion-icon
-                name="chevron-down-outline"
-                class="collapse__link"
-              ></ion-icon>
-
-              <ul class="collapse__menu">
-                <a href="../txLogs/listLogs.html" class="collapse__sublink"
-                  >All</a
-                >
-                <a href="../txLogs/listQueued.html" class="collapse__sublink"
-                  >Queued</a
-                >
-                <a href="../txLogs/listExecuted.html" class="collapse__sublink"
-                  >Completed</a
-                >
-                <a href="../txLogs/listCancelled.html" class="collapse__sublink"
-                  >Cancelled</a
-                >
-                <a href="../txLogs/listFailed.html" class="collapse__sublink"
-                  >Failed</a
-                >
-              </ul>
-            </div>
+<body>
+  <div class="body-pd">
+    <div class="l-navbar" id="navbar">
+      <nav class="nav">
+        <div>
+          <div class="nav__brand">
+            <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
+            <a href="#" class="nav__logo">Timelock</a>
           </div>
-        </nav>
+
+          <div class="nav__link collapse ">
+            <ion-icon name="key-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Accounts</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../accountManager/create.html" class="collapse__sublink">Create</a>
+              <a href="../accountManager/find.html" class="collapse__sublink">Search</a>
+              <a href="../accountManager/list.html" class="collapse__sublink">List</a>
+              <a href="../accountManager/purge.html" class="collapse__sublink">Purge</a>
+            </ul>
+          </div>
+          <div class="nav__link collapse ">
+            <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
+
+            <span class="nav__name">Deposit</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../deposit/create.html" class="collapse__sublink">Deposit</a>
+              <a href="../deposit/withdraw.html" class="collapse__sublink">Withdrawal</a>
+              <a href="../deposit/myDeposit.html" class="collapse__sublink">Balance Enquiry</a>
+              <a href="../deposit/find.html" class="collapse__sublink">Other Acc Balances</a>
+            </ul>
+          </div>
+          <div class="nav__link collapse">
+            <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Timelock</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../timelock/queue.html" class="collapse__sublink">Queue</a>
+              <a href="../timelock/execute.html" class="collapse__sublink">Execute</a>
+              <a href="../timelock/cancel.html" class="collapse__sublink">Cancel</a>
+            </ul>
+          </div>
+          <div class="nav__link collapse active">
+            <ion-icon name="lock-open-outline" class="nav__icon"></ion-icon>
+            <span class="nav__name">Transaction Logs</span>
+
+            <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
+
+            <ul class="collapse__menu">
+              <a href="../txLogs/listLogs.html" class="collapse__sublink">All</a>
+              <a href="../txLogs/listQueued.html" class="collapse__sublink">Queued</a>
+              <a href="../txLogs/listExecuted.html" class="collapse__sublink">Completed</a>
+              <a href="../txLogs/listCancelled.html" class="collapse__sublink">Cancelled</a>
+              <a href="../txLogs/listFailed.html" class="collapse__sublink">Failed</a>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+  <form onsubmit="return false">
+    <div class="container" style="width: auto">
+      <h1>Transaction Logs</h1>
+      <p>List of transactions.</p>
+
+      <div id="table"></div>
+
+      <div class="clearfix">
+        <button onclick="_listLogs()" class="btn">Refresh</button>
       </div>
     </div>
-    <form onsubmit="return false">
-      <div class="container" style="width: auto">
-        <h1>Transaction Logs</h1>
-        <p>List of transactions.</p>
-
-        <div id="table"></div>
-
-        <div class="clearfix">
-          <button onclick="_listLogs()" class="btn">Refresh</button>
-        </div>
-      </div>
-    </form>
-    <div class="avatars" id="accounts">
-      <!-- <a href="#" onclick="switchAccount(0)" class="avatars__item"
+  </form>
+  <div class="avatars" id="accounts">
+    <!-- <a href="#" onclick="switchAccount(0)" class="avatars__item"
         ><img
           class="avatar"
           src="https://randomuser.me/api/portraits/women/65.jpg"
@@ -160,13 +109,14 @@
           src="https://randomuser.me/api/portraits/women/25.jpg"
           alt=""
       /></a> -->
-    </div>
-  </body>
-  <script>
-    let _listLogs = async () => {
-      // let address = document.forms[0].address.value;
-      let data = await listLogs();
-      document.getElementById("table").innerHTML = `
+  </div>
+</body>
+<script>
+  let _listLogs = async () => {
+    // let address = document.forms[0].address.value;
+    let data = await listLogs();
+
+    document.getElementById("table").innerHTML = `
   <div class="table-wrapper">
     <table>
       <thead>
@@ -178,39 +128,74 @@
 
           <th>Execution Timestamp</th>
                     <th>Status</th>
+                    <th>Timer</th>
 
         </tr>
       </thead>
       <tbody>
         ${data.map(
-          (obj) =>
-            ` <tr>
-          <td>${obj[0]}</td>
+      (obj) =>
+        ` <tr>
+          <td >${obj[0]}</td>
           <td>${obj[2]}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
-          <td >${unixToDateTime(obj[4])}</td>
-          <td y>${unixToDateTime(obj[5])}</td>
+          <td style=' white-space:nowrap;' >${unixToDateTime(obj[4])}</td>
+          <td style=' white-space:nowrap;' >${unixToDateTime(obj[5])}</td>
 
-          <td>${getStatus(obj[6])}</td>
+          <td style=' white-space:nowrap;' >${getStatus(obj[6])}</td>
+                <td>
+                  <span style=' white-space:nowrap;'  id="timeout-${obj[0]}"></span> </td>
       
         </tr>`
-        )}
+    )}
       </tbody>
     </table>
   </div>`;
-      // document.forms[0].username.value = name
-      // document.forms[0].email.value = email
-    };
 
-    setTimeout(() => {
-      _listLogs();
-    }, 1000);
-  </script>
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/logs.js"></script>
-  <script src="../scripts/timeLock.js"></script>
+    data.forEach((obj) => {
+      const endTime = new Date(obj[5] * 1000); // Convert to milliseconds
+      const timeoutElement = document.getElementById(`timeout-${obj[0]}`);
 
-  <script src="../scripts/config.js"></script>
-  <script src="../scripts/navbar.js"></script>
-  <script src="../scripts/automation.js"></script>
+      const updateTime = () => {
+        const now = Date.now();
+        const remainingTime = Math.max(endTime - now, 0); // Ensure non-negative time
+
+        const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const
+          minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+        const
+          formattedTime = `${days ? days + 'd ' : ''}${hours ? hours + 'h ' : ''}${minutes ? minutes + 'm ' : ''}${seconds}s`;
+        timeoutElement.textContent = formattedTime;
+
+        if (remainingTime === 0) {
+          clearInterval(intervalId); // Stop timer when timeout is reached
+          timeoutElement.textContent = 'Expired';
+        }
+      };
+
+      const intervalId = setInterval(updateTime, 1000); // Update time every second
+      updateTime(); // Call updateTime initially to display current remaining time
+    });
+  };
+
+  // _listAccounts();
+  // document.forms[0].username.value = name
+  // document.forms[0].email.value = email
+
+
+  setTimeout(() => {
+    _listLogs();
+  }, 1000);
+</script>
+<script src="../scripts/common.js"></script>
+<script src="../scripts/logs.js"></script>
+<script src="../scripts/timeLock.js"></script>
+
+<script src="../scripts/config.js"></script>
+<script src="../scripts/navbar.js"></script>
+<script src="../scripts/automation.js"></script>
+
 </html>
