@@ -113,7 +113,7 @@
 <script>
   let _listLogs = async () => {
     // let address = document.forms[0].address.value;
-//     let data = await listLogs();
+    let data = await listLogs();
 //  let acc = (await listAccounts()).find((acc)=>acc[0]==obj[2])
 //       let name = ""
     document.getElementById("table").innerHTML = `
@@ -159,7 +159,7 @@
       const timeoutElement = document.getElementById(`timeout-${obj[0]}`);
 
       const updateTime = () => {
-        if(obj[0]=="0"){
+        if(obj[6]=="0"){
         const now = Date.now();
         const remainingTime = Math.max(endTime - now, 0); // Ensure non-negative time
 

@@ -4,8 +4,8 @@ var AccountManagerContract = artifacts.require("AccountManager");
 module.exports = async function (deployer) {
   // deployment steps
 
-  let accManagerContractAddress = "0xC417333eFFb799A5e545C66DFD9c2fFC10877287";
-  let TimelockContractAddress = "0x7F3961ed7d1571047e6bd09e4256B2B6075Ce095";
+  let accManagerContractAddress = "0xda4276a2c6848600d231AA0f5aDb11f04a3f6b7D";
+  let TimelockContractAddress = "0x655A05eA7a7C64415BA16765D8D47BafCd6cE84B";
   await deployer.deploy(AccountManagerContract).then(({ address }) => {
     console.log(address)
     accManagerContractAddress = address;
