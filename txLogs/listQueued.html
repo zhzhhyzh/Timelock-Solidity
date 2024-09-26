@@ -37,7 +37,7 @@
           <div class="nav__link collapse ">
             <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
 
-              <span class="nav__name">Funds</span>
+            <span class="nav__name">Funds</span>
 
             <ion-icon name="chevron-down-outline" class="collapse__link"></ion-icon>
 
@@ -115,6 +115,8 @@
   let _listLogs = async () => {
     // let address = document.forms[0].address.value;
     let data = await listQueued();
+    let acc = (await listAccounts()).find((acc) => acc[0] == obj[2])
+    let name = ""
     document.getElementById("table").innerHTML = `
   <div class="table-wrapper">
     <table>
@@ -132,10 +134,10 @@
       </thead>
       <tbody>
         ${await Promise.all(data.map(
-          async (obj) =>
-            ` <tr>
+      async (obj) =>
+        ` <tr>
           <td>${obj[0]}</td>
-          <td>${(await listAccounts()).find((acc)=>acc[0]==obj[2])[1]}</td>
+          <td>${name}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
           <td style=' white-space:nowrap;'>${unixToDateTime(obj[4])}</td>
           <td style=' white-space:nowrap;'>${unixToDateTime(obj[5])}</td>
@@ -143,7 +145,7 @@
           <span id="timeout-${obj[0]}" style=' white-space:nowrap;'></span> </td>
       
         </tr>`
-        ))}
+    ))}
       </tbody>
     </table>
   </div>`;
@@ -184,7 +186,7 @@
   }, 1000);
 </script>
 <script src="../scripts/common.js"></script>
-  <script src="../scripts/accountManager.js"></script>
+<script src="../scripts/accountManager.js"></script>
 
 <script src="../scripts/logs.js"></script>
 <script src="../scripts/timeLock.js"></script>

@@ -165,6 +165,8 @@
     let _listLogs = async () => {
       // let address = document.forms[0].address.value;
       let data = await listExecuted();
+       let acc = (await listAccounts()).find((acc)=>acc[0]==obj[2])
+      let name = ""
       document.getElementById("table").innerHTML = `
   <div class="table-wrapper">
     <table>
@@ -183,7 +185,7 @@
           async (obj) =>
             ` <tr>
           <td>${obj[0]}</td>
-          <td>${(await listAccounts()).find((acc)=>acc[0]==obj[2])[1]}</td>
+          <td>${name}</td>
           <td style='  text-align: right; '>${obj[3] / 10 ** 18}</td>
           <td >${unixToDateTime(obj[4])}</td>
           <td y>${unixToDateTime(obj[5])}</td>
