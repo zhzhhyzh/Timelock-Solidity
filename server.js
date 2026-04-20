@@ -8,7 +8,11 @@ app.get("/", (req, res) => {
 
 app.use('/',express.static(__dirname+""));
 
-const server = app.listen(5000);
-const portNumber = server.address().port;
-console.log(`port is open on ${portNumber}`);
+if (process.env.VERCEL !== '1') {
+    const server = app.listen(5000);
+    const portNumber = server.address().port;
+    console.log(`port is open on ${portNumber}`);
+}
+
+module.exports = app;
 

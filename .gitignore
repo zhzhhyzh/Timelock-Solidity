@@ -133,4 +133,5 @@ dist
 /build/contracts/AccountManager.json
 /build/contracts/Timelock.json
 
-
+# Vercel
+.vercel
